@@ -26,7 +26,7 @@ peiyucn-skills/                              # Repo root = marketplace
 │           ├── export-onenote.ps1     # OneNote COM export (Windows; optional)
 │           └── format-onenote-xml.ps1 # XML pretty-printing (optional; before import)
 
-> `notes/` and `.templates/` are user-space — they do not live in this repo.
+> `notes/` and `.note2md/` are user-space — they do not live in this repo.
 > `test/` is a scratch directory for manual testing — gitignored.
 ```
 

@@ -1,16 +1,28 @@
-﻿# peiyucn-skills — Agent 技能市场
+# peiyucn-skills — Agent 技能市场
 
 简体中文 | [English](README.md) | [GitHub](https://github.com/peiyucn/peiyucn-skills)
 
-> Agent 原生技能，可在 Copilot、Claude Code、Codex 上通用安装。本仓库是一个**市场** — 添加一次，即可安装它提供的任意插件。
+> Agent 原生技能，可在 Copilot、Claude Code、Codex 上通用安装。本仓库是一个个个市场个个 — 添加一次，即可安装它提供的任意插件。
 
 ## 安装市场
 
-**VS Code Copilot** — 添加市场 `https://github.com/peiyucn/peiyucn-skills`，然后安装你需要的插件。
 
-**Claude Code** — 先 `/marketplace add https://github.com/peiyucn/peiyucn-skills`，再 `/plugin install note2md`。
 
-**Codex CLI** — `codex plugin install https://github.com/peiyucn/peiyucn-skills`（安装市场内的全部插件）。
+VS Code Copilot
+
+ — 添加市场 `https://github.com/peiyucn/peiyucn-skills`，然后安装你需要的插件。
+
+
+
+Claude Code
+
+ — 先 `/marketplace add https://github.com/peiyucn/peiyucn-skills`，再 `/plugin install note2md`。
+
+
+
+Codex CLI
+
+ — `codex plugin install https://github.com/peiyucn/peiyucn-skills`（安装市场内的全部插件）。
 
 ## 插件
 
@@ -18,7 +30,7 @@
 
 Markdown 笔记，按笔记本→分区→页面三层结构组织，通过斜杠命令管理。你的笔记就是文件夹和 `.md` 文件 — 用任何编辑器都能打开。但 Agent 也能帮你管理：创建笔记本、组织分区、从模板写页面、从 OneNote 导入、归档旧内容。
 
-安装：`note2md` 插件。
+>   模型要求：   本技能依赖模型执行多步流程（导入管线、模板工作流、校验环节）。已在   deepseek-v4-flash（high）   上测试验证 — 能力不低于此模型的应可正常使用。过小或较弱的模型可能执行不稳定，我们无法给出硬性保证。
 
 #### 命令
 
@@ -33,43 +45,36 @@ Markdown 笔记，按笔记本→分区→页面三层结构组织，通过斜�
 | `/note2md newpage [模板]` | 创建页面 — 无参数=空白页；`daily`/`meeting`/`quick-note`=使用模板 |
 | `/note2md newtemplate` | 从分区中的同类页面提取模板 |
 | `/note2md securecheck` | 检查笔记中的密码、身份证、API 密钥等敏感信息 |
-| `/note2md archive` | 将旧的笔记本、分区或页面移入 `_archive/` |
-
-> **Copilot Chat** — 输入 `/note2md` 然后 Tab 查看 8 个子命令（如 `/note2md newpage`）。
-> **Claude Code / Codex** — 输入 `/note2md-` 然后 Tab 自动补全。
+| `/note2md archive` | 将旧的笔记本、分区或页面移入归档 |
 
 第一次用？输入 `/note2md help`（Copilot）或 `/note2md-help`（Claude/Codex）快速了解。
 
-#### 无锁定
+#### 自由使用
 
-笔记本 = 文件夹。分区 = 子文件夹。页面 = `.md` 文件。你可以通过文件管理器创建、重命名、移动或删除任何内容 — Agent 自动感知变化。命令只是可选的便利工具。
+笔记本 = 文件夹。分区 = 子文件夹。页面 = `.md` 文件。想怎么用都行：用自然语言告诉 Agent 你的需求，用斜杠命令执行操作，或直接用文件管理器创建、重命名、移动、删除 — Agent 会自动感知变化。命令只是可选的便利工具。
 
 #### 模板
 
 `/note2md newpage` 始终提供模板选择。插件自带三个默认模板：
 
-| 模板 | 文件 |
+| 模板 | 名称 |
 |------|------|
-| 日记 | `templates/daily.md` |
-| 会议记录 | `templates/meeting.md` |
-| 快速笔记 | `templates/quick-note.md` |
+| 日记 | `daily` |
+| 会议记录 | `meeting` |
+| 快速笔记 | `quick-note` |
 
-将你自己的模板放到 `notes/.templates/` 下 — 它们会自动出现在 `/note2md newpage` 中，并覆盖同名的默认模板。
+将你自己的模板放到 `notes/.note2md/templates/` 下 — 它们会自动出现在 `/note2md newpage` 中，并按名称覆盖同名默认模板。
 
 使用 `/note2md newtemplate` 从任意分区中提取模板 — 选择分区、可选描述需求，Agent 会从同类笔记中提炼出模板骨架。
 
 #### OneNote 导入
 
-使用 `/note2md init` 导入你现有的 OneNote 笔记本。**无需 Python 或任何运行时** — Agent 原生将 XML 转换为 Markdown，并带强制校验环节（数量核对 + 抽查）。
+使用 `/note2md init` 导入你现有的 OneNote 笔记本。文本类内容 — 表格、列表、标题、待办、OCR 文本 — 会自动转换为 Markdown。
 
-- **Windows + OneNote 桌面版：** 可用可选的 PowerShell 脚本自动导出笔记本。
-- **macOS / Linux（或无 OneNote 桌面版）：** 没有自动导出（COM API 仅限 Windows）— 你必须自己导出 XML（例如在装有 OneNote 桌面版的 Windows 机器上导出），再把目录告诉 `init`。
+*   Windows + OneNote 桌面版：   Agent 可以自动导出你的笔记本。
+*   macOS / Linux（或无 OneNote 桌面版）：   没有自动导出（仅限 Windows）— 你需要自己导出 XML（例如在装有 OneNote 桌面版的 Windows 机器上导出），再把文件位置告诉 `init`。
 
-结果：`notes/` 镜像你原始的 笔记本 → 分区 → 页面 结构，文本、表格、列表、标题、待办会转换为 Markdown。
-
-所有导入产物（自动导出的 XML、排版副本）都放在笔记根目录**内部**的 `_import/` 临时暂存区，导入完成后删除。如果你自行导出 OneNote XML，请把文件放到 `{notes_root}/_import/` 下再运行 `init`，Agent 会从这里拾取。
-
-> **已知限制：** 图片、文件附件、超链接、墨迹/绘图、公式、音频、视频**暂不提取**（完整清单和路线图见 [docs/onenote-loss-matrix.md](docs/onenote-loss-matrix.md)）。仅保证文本类内容。
+>   已知限制：   图片、文件附件、超链接、墨迹/绘图、公式、音频、视频频频暂不提取频频（完整清单见 [docs/onenote-loss-matrix.md](docs/onenote-loss-matrix.md)）。仅保证文本类内容。
 
 ## License
 

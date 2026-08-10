@@ -1,5 +1,5 @@
-# OneNote import/export temp directory (created under {notes_root} by the skill)
-_import/
+# OneNote import staging (created under {notes_root}/.note2md/ by the skill)
+.note2md/import/
 
 # User notes (not part of the plugin)
 notes/

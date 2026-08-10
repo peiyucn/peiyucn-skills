@@ -74,12 +74,13 @@ peiyucn-skills/                          — 仓库根 = 市场
 │   └── skills/note2md/
 │       ├── SKILL.md               — **单一真相来源**：所有命令的完整执行逻辑
 │       ├── templates/             — 内置模板（daily / meeting / quick-note）
-│       │   ├── daily.md
-│       │   ├── meeting.md
-│       │   └── quick-note.md
+│       │   ├── daily.template.md
+│       │   ├── meeting.template.md
+│       │   └── quick-note.template.md
 │       └── tools/
 │           ├── export-onenote.ps1     — OneNote 自动导出（Windows + COM API，可选）
-│           └── format-onenote-xml.ps1 — XML 排版为多行缩进（导入前必读保障，可选）
+│           ├── format-onenote-xml.ps1 — XML 排版为多行缩进（抽查用，可选）
+│           └── convert-onenote-md.ps1 — XML→MD 确定性转换（核心，含 fixture 自测）
 ```
 
 ### 关键文件

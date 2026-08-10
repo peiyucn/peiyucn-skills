@@ -30,7 +30,7 @@ peiyucn-skills/                              # 仓库根 = 市场
 │           ├── export-onenote.ps1     # OneNote COM 导出（Windows；可选）
 │           └── format-onenote-xml.ps1 # XML 排版（可选；导入前使用）
 
-> `notes/` 和 `.templates/` 属于用户空间 — 不在此仓库中。
+> `notes/` 和 `.note2md/` 属于用户空间 — 不在此仓库中。
 > `test/` 是手工测试用的临时目录 — 已被 git 忽略。
 ```
 

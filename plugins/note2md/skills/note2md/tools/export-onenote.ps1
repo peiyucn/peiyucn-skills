@@ -4,12 +4,12 @@
 .DESCRIPTION
   使用 OneNote COM API 遍历所有笔记本→分区→页面，导出为 XML。
   自动跳过回收站（OneNote_RecycleBin）。
-  OutputDir 为必填参数 — 由调用方（Agent）显式指定，通常为 {notes_root}/_import/。
+  OutputDir 为必填参数 — 由调用方（Agent）显式指定，通常为 {notes_root}/.note2md/import/。
 .PARAMETER OutputDir
-  导出目标目录（必填）。建议传入笔记根目录下的 _import/ 临时区，
+  导出目标目录（必填）。建议传入笔记根目录下的 .note2md/import/ 临时区，
   切勿使用相对 cwd 的路径，避免导入产物污染工作区。
 .EXAMPLE
-  .\export-onenote.ps1 -OutputDir "D:\notes\_import"
+  .\export-onenote.ps1 -OutputDir "D:\notes\.note2md\import"
 #>
 
 param(
@@ -18,7 +18,15 @@ param(
 )
 
 if ([string]::IsNullOrWhiteSpace($OutputDir)) {
-    Write-Host "ERROR: -OutputDir is required. Example: export-onenote.ps1 -OutputDir `"<notes_root>\_import`"" -ForegroundColor Red
+    Write-Host "ERROR: -OutputDir is required. Example: export-onenote.ps1 -OutputDir `"<notes_root>/.note2md/import`"" -ForegroundColor Red
+    exit 1
+}
+
+# 平台保护：OneNote COM API 仅限 Windows。macOS/Linux（pwsh）直接友好退出，
+# 不要抛出难懂的 New-Object COM 错误。
+if ($PSVersionTable.PSEdition -eq "Core" -and -not $IsWindows) {
+    Write-Host "ERROR: export-onenote.ps1 requires Windows + OneNote desktop (COM API)." -ForegroundColor Red
+    Write-Host "  On macOS/Linux, export your notebooks to XML elsewhere (e.g. on a Windows machine), then use convert-onenote-md.ps1 to convert." -ForegroundColor Yellow
     exit 1
 }
 

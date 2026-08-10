@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   将 OneNote 导出的 XML 文件排版为缩进多行格式，便于 Agent 完整读取。
 .DESCRIPTION
@@ -6,7 +6,7 @@
   Agent 的文件读取工具对单行有显示上限，会截断内容导致转换遗漏。
   本脚本将指定目录下的所有 .xml 递归排版为可读的多行缩进格式。
 
-  建议在 {notes_root}/_import/ 临时暂存区就地执行，或输出到
+  建议在 {notes_root}/.note2md/import/ 临时暂存区就地执行，或输出到
   <InputDir>_pretty/，绝不要输出到工作区根目录。
 
 .PARAMETER InputDir
@@ -16,9 +16,9 @@
 .PARAMETER InPlace
   就地覆盖原始文件（与 OutputDir 互斥）。
 .EXAMPLE
-  .\format-onenote-xml.ps1 -InputDir "D:\notes\_import"
-  .\format-onenote-xml.ps1 -InputDir "D:\notes\_import" -InPlace
-  .\format-onenote-xml.ps1 -InputDir "D:\notes\_import" -OutputDir "D:\notes\_import_pretty"
+  .\format-onenote-xml.ps1 -InputDir "D:\notes\.note2md\import"
+  .\format-onenote-xml.ps1 -InputDir "D:\notes\.note2md\import" -InPlace
+  .\format-onenote-xml.ps1 -InputDir "D:\notes\.note2md\import" -OutputDir "D:\notes\.note2md\import_pretty"
 #>
 
 param(

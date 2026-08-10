@@ -14,16 +14,17 @@ You are the interface to the user's note system. All notes use the same **Notebo
 │   │   ├── {page}.md        # Page (an individual note)
 │   │   └── ...
 │   └── ...
-├── _import/                 # Temporary staging for OneNote imports (created on demand)
-├── _archive/                # Archive — agent never reads this by default
-└── .templates/              # User templates — override plugin defaults
+└── .note2md/                # Internal area — never a notebook
+    ├── templates/           # User templates (plugin defaults stay in <skill_dir>/templates/)
+    ├── archive/             # Archive — agent never reads this by default
+    └── import/              # Import staging (created at init; cleared only with user's permission)
 ```
 
 >   No lock-in.   Every notebook is a folder, every section is a subfolder, every page is a `.md` file. You can create, rename, move, or delete anything through your file manager — the agent picks up the changes automatically. Commands are optional convenience.
 
 > `{notes_root}` is set during `init` (default: `./notes/`). All paths below use this variable.
 
-> **Root discipline:** once `{notes_root}` is resolved, every artifact — notebooks, `_archive/`, `.templates/`, and the temporary `_import/` staging area — lives under it. Never write import/export artifacts to the current working directory unless the user explicitly chose it as `{notes_root}`.
+> **Root discipline:** once `{notes_root}` is resolved, every artifact — notebooks and `.note2md/` (internal: `templates/`, `archive/`, `import/`) — lives under it. Never write import/export artifacts to the current working directory unless the user explicitly chose it as `{notes_root}`.
 
 ***
 
@@ -63,12 +64,12 @@ First time?
 
 Templates?
   newpage always offers templates. The plugin comes with diary, meeting, and quick-note.
-  Add your own under notes/.templates/ — they'll appear automatically.
+  Add your own under notes/.note2md/templates/ (named {name}.template.md) — they'll appear automatically.
   newtemplate extracts a template from any section with similar pages.
 
 OneNote?
-  init imports text content (tables, lists, headings, to-dos). Images, attachments, links, ink, and media are not extracted yet.
-  No Python or other runtime needed — conversion is done by the agent itself.
+  init imports text content (tables, lists, headings, to-dos, OCR text). Images, attachments, ink, and media are not extracted.
+  Conversion is deterministic — a bundled PowerShell script does it (no Python, no Node). Windows ships PowerShell; others can use pwsh.
   Auto-export needs Windows + OneNote desktop; on other platforms, point init at any folder of OneNote XML exports.
 
 Security?
@@ -118,13 +119,24 @@ Options:
 
 #### Import Path
 
-**No prerequisites.** No Python, no Node, no runtime — conversion is done by you (the agent) natively. The only optional helper is a bundled PowerShell export script, used solely for Windows users with OneNote desktop.
+**Runtime: PowerShell only.** No Python, no Node — conversion is done by the bundled `convert-onenote-md.ps1` script (deterministic, fixture-tested), not by hand. Windows ships PowerShell 5.1; macOS/Linux can use `pwsh`. The only Windows-only helper is `export-onenote.ps1`, used solely for Windows users with OneNote desktop.
+
+In the commands below, `powershell` means `powershell` on Windows and `pwsh` on macOS/Linux — the two cross-platform scripts (`format-onenote-xml.ps1`, `convert-onenote-md.ps1`) run on any platform that has PowerShell.
 
 Proceed to the [Import Pipeline](#import-pipeline), which handles platform detection and export options.
 
 **Start import:**
 
-First, check whether `{notes_root}/` already contains anything (excluding `_import/`, `_archive/`, and `.templates/`).
+First, ensure the internal area exists — create it if missing (same three directories as Fresh Start, so the skill works identically either way):
+
+```
+{notes_root}/.note2md/
+├── templates/        # user templates only (empty at init)
+├── archive/
+└── import/           # import staging
+```
+
+Then check whether `{notes_root}/` already contains anything (excluding `.note2md/`).
 
 If it is **empty**, proceed straight to the [Import Pipeline](#import-pipeline) — no conflict to resolve.
 
@@ -139,7 +151,7 @@ Options:
 ```
 
 - **Merge** (default): run the Import Pipeline as-is. The existing files stay untouched; the Phase 2 rule "avoid overwrites" (`(2)`, `(3)`, … suffix) applies on top of them.
-- **Clear then import**: before running the pipeline, delete the contents of `{notes_root}/` **except** `_import/`, `_archive/`, and `.templates/` — and confirm once more before deleting:
+- **Clear then import**: before running the pipeline, delete the contents of `{notes_root}/` **except** `.note2md/` — and confirm once more before deleting:
 
   ```
   Question: "This will permanently delete all current notes under {notes_root}/. Continue?"
@@ -159,8 +171,10 @@ After import, tell the user: "Import complete. Use `newtemplate` on any section 
    {notes_root}/
    ├── {Notebook}/
    ├── Quick Notes/
-   ├── _archive/
-   └── .templates/
+   └── .note2md/
+       ├── templates/        # user templates only (empty at init)
+       ├── archive/
+       └── import/           # import staging (created at init)
    ```
 3. Ask: "First section name in {Notebook}?"
 4. Create `{notes_root}/{Notebook}/{Section}/`
@@ -187,7 +201,7 @@ Setup complete. The resolved `{notes_root}` is used for all subsequent operation
 
 | Step | Action |
 |------|--------|
-| 1 | Get notebook + section — from arguments or ask (list notebooks, exclude `_archive/`) |
+| 1 | Get notebook + section — from arguments or ask (list notebooks, exclude `.note2md/`) |
 | 2 | Create `{notes_root}/{Notebook}/{Section}/` |
 | 3 | Confirm: "Section '{Section}' created in '{Notebook}'." |
 
@@ -205,22 +219,22 @@ Template-first; "blank page" always available as the last option.
 
 Scan in priority order:
 
-1. `{notes_root}/.templates/*.md` (user templates — highest priority)
-2. `<skill_dir>/templates/*.md` (plugin defaults — fallback)
+1. `{notes_root}/.note2md/templates/*.md` (user templates — highest priority; named `{name}.template.md`, see [Template System](#template-system))
+2. `<skill_dir>/templates/*.template.md` (plugin defaults — fallback)
 
-Plugins defaults: `daily.md`, `meeting.md`, `quick-note.md`. See [Template System](#template-system).
+Plugins defaults: `daily.template.md`, `meeting.template.md`, `quick-note.template.md`. See [Template System](#template-system).
 
 ### Step 2 — Resolve Template
 
 | Condition | Action |
 |-----------|--------|
 | `newpage` (no argument) | Skip to Step 3 — blank page |
-| `newpage {name}` (argument provided) | Try exact match against discovered templates. If found → use it. If not found or ambiguous → present choices: |
+| `newpage {name}` (argument provided) | Match by base name, ignoring the `.template.md` suffix (`newpage 待办` → `待办.template.md`). If found → use it. If not found or ambiguous → present choices: |
 
 ```
 Question: "Which template?"
 Options:
-  - ...any user templates found in .templates/...  ← user templates FIRST
+  - ...any user templates found in .note2md/templates/...  ← user templates FIRST
   - "📅 Daily Journal (daily)"
   - "🤝 Meeting Notes (meeting)"
   - "💡 Quick Note (quick-note)"
@@ -243,7 +257,7 @@ Default frontmatter:
 ```yaml
 ---
 date: YYYY-MM-DD
-type: {filename_without_.md}    # e.g. "daily", "meeting"; "note" for blank
+type: {template basename}    # e.g. "daily", "meeting"; "note" for blank — strip the .template.md/.md suffix
 title: {user_input}
 tags: []
 ---
@@ -256,9 +270,21 @@ tags: []
 | Template | Read `.md`, replace `{{DATE}}`, `{{TITLE}}`, `{{TOPIC}}`. Ask for unknown `{{KEY}}`. |
 | Blank | No body — frontmatter only |
 
+### Step 5.5 — Template Creation Contract
+
+The requirements the user gave when creating the template (via `newtemplate` step 2) are the **execution contract for creating pages from it**. When the template's frontmatter has these fields, honor them:
+
+| Field | Execution on `newpage` |
+|-------|------------------------|
+| `filename` | Derive the filename from this pattern instead of the default naming rules — replace `{{KEY}}` placeholders with the answers already asked, or follow the natural-language description. |
+| `base` | Ask the user whether to seed the new page from the reference page; copy its content as the starting point if they agree. |
+| `confirm` | Ask each comma-separated item in turn via `askQuestions`, in addition to the `{{KEY}}` placeholders already asked. |
+
+All fields optional — a template without them behaves exactly as before.
+
 ### Step 6 — Filename
 
-Match `type` against the naming rules below (see [File Naming](#file-naming)). Append `(2)` if exists.
+If the template has a `filename` field, use it (see [Step 5.5](#step-55--template-creation-contract)). Otherwise match `type` against the naming rules below (see [File Naming](#file-naming)). Append `(2)` if exists.
 
 ### Step 7 — Confirm
 
@@ -286,7 +312,7 @@ Options:
 
 | Scope | Action |
 |-------|--------|
-| Notebook | List all notebooks (excluding `_archive/`), ask which one |
+| Notebook | List all notebooks (excluding `.note2md/`), ask which one |
 | Section | List notebooks → ask which one → list its sections → ask which one |
 | Page | List notebooks → section → ask which page |
 
@@ -294,40 +320,27 @@ Highlight items untouched for > 3 months. Allow multi-select.
 
 ### Step 3 — Confirm & Move
 
-Preserve the original directory structure under `_archive/`:
+Preserve the original directory structure under `.note2md/archive/`:
 
 | Scope | Moves |
 |-------|-------|
-| Notebook | `{notes_root}/{Notebook}/` → `{notes_root}/_archive/{Notebook}/` |
-| Section | `{notes_root}/{Notebook}/{Section}/` → `{notes_root}/_archive/{Notebook}/{Section}/` |
-| Page | `{notes_root}/{Notebook}/{Section}/{page}.md` → `{notes_root}/_archive/{Notebook}/{Section}/{page}.md` |
+| Notebook | `{notes_root}/{Notebook}/` → `{notes_root}/.note2md/archive/{Notebook}/` |
+| Section | `{notes_root}/{Notebook}/{Section}/` → `{notes_root}/.note2md/archive/{Notebook}/{Section}/` |
+| Page | `{notes_root}/{Notebook}/{Section}/{page}.md` → `{notes_root}/.note2md/archive/{Notebook}/{Section}/{page}.md` |
 
 Empty parent directories left behind? Clean them up (e.g. if all sections of a notebook are archived, the notebook folder becomes empty — ask if it should be removed).
 
-### Step 4 — Context Refresh
-
-Archiving large content saves tokens and keeps attention focused on active notebooks. After archiving, ask:
-
-```
-Question: "Archive done. Refresh context to focus on the leaner active set and save tokens?"
-Options:
-  - "Yes — refresh context" (recommended after large archives)
-  - "Not now"
-```
-
-If user confirms, re-scan `{notes_root}/` (excluding `_import/` and `_archive/`) to rebuild the working context with only active notebooks.
-
 ### Rules
 
-* Never read `_import/` or `_archive/` during normal operations
-* Only search `_archive/` when user says "search archive"
+* Never read `.note2md/import/` or `.note2md/archive/` during normal operations
+* Only search `.note2md/archive/` when user says "search archive"
 * Archived items can be restored by moving them back to their original path
 
 ***
 
 ## `securecheck` — Security Check
 
-Scans `{notes_root}/` (excluding `_import/` and `_archive/`) for sensitive information. Read files directly — you understand context, not just regex.
+Scans `{notes_root}/` (excluding `.note2md/`) for sensitive information. Read files directly — you understand context, not just regex.
 
 ### What to Look For
 
@@ -354,7 +367,7 @@ Use your judgment — if it walks like a secret, flag it.
    ```
 
    If custom patterns provided, add them to the scan list.
-3. Search across `{notes_root}/` (skip `_import/`, `_archive/` and `.templates/`)
+3. Search across `{notes_root}/` (skip `.note2md/`)
 4. For each match:
 
    * Report the file path and line number
@@ -362,7 +375,7 @@ Use your judgment — if it walks like a secret, flag it.
    * Example: `⚠️ notes/Work/Projects/credentials.md:12 — Possible password`
 5. Never output the actual sensitive value. Use `[REDACTED]` if context is needed.
 6. Summary: "Found N potential issues across M files."
-7. Remind: "You can move sensitive files to \_archive/ or delete them. Use archive to clean up."
+7. Remind: "You can move sensitive files to .note2md/archive/ or delete them. Use archive to clean up."
 
 ### Scope Options
 
@@ -383,17 +396,21 @@ Options:
 ### Priority
 
 ```
-{notes_root}/.templates/{name}.md    ← User override (highest)
-<skill_dir>/templates/{name}.md      ← Plugin default (fallback)
+{notes_root}/.note2md/templates/{name}.template.md   ← User override (highest)
+<skill_dir>/templates/{name}.template.md    ← Plugin default (fallback)
 ```
+
+### Naming Convention
+
+All templates — user and plugin defaults — use the `{name}.template.md` suffix so they're recognizable as templates at a glance (e.g. `待办.template.md`, `daily.template.md`). `newpage {name}` matches by base name, ignoring the suffix — `newpage 待办` finds `待办.template.md`, `newpage daily` finds `daily.template.md`.
 
 ### Built-in Defaults
 
 | Template | File |
 |----------|------|
-| Daily Journal | `daily.md` |
-| Meeting Notes | `meeting.md` |
-| Quick Note | `quick-note.md` |
+| Daily Journal | `daily.template.md` |
+| Meeting Notes | `meeting.template.md` |
+| Quick Note | `quick-note.template.md` |
 
 ### Creating User Templates
 
@@ -402,14 +419,19 @@ Options:
 
 
 1. Ask: which notebook → which section to analyze.
-2. Give the user a chance to describe their needs before extracting:
+2. Ask about the template in one pass (before extracting) — structure needs plus the three creation questions (filename format, reference page, other confirmations):
 
    ```
    Question: "I'll analyze the pages in '{Section}' to build a template. Any specific requirements?"
    Options:
      - "No preference — just find the common structure" (default)
      - "Let me describe what I want" (free text input)
+   Question: "When creating a page from this template, how should the filename be decided?"
+   Question: "Should creating a page from this template be based on an existing page?"
+   Question: "Anything else you want to confirm with the user when creating a page from this template?"
    ```
+
+   Record the answers — structure needs guide the extraction; filename / base / confirm go into the template frontmatter.
 3. Read all `.md` pages in that section. If the user provided requirements, use them to guide the extraction (e.g. "focus on the action items section", "combine the agenda and notes patterns").
 4. Compare their structure to find common patterns:
 
@@ -418,11 +440,11 @@ Options:
    * Body text that varies → replace with representative {{PLACEHOLDER}}
 5. Show the extracted template and report: "Found N pages with similar structure in '{Section}'."
 6. Ask: "Save this template? Give it a name."
-7. Write to `{notes_root}/.templates/{name}.md`. From now on, `newpage` will include it.
+7. Write to `{notes_root}/.note2md/templates/{name}.template.md` (including the `filename` / `base` / `confirm` fields from step 2). From now on, `newpage` will include it.
 
 
 
-**Manual**: Drop `.md` files into `{notes_root}/.templates/`. Auto-discovered by `newpage`.
+**Manual**: Drop `{name}.template.md` files into `{notes_root}/.note2md/templates/`. Auto-discovered by `newpage`.
 
 ***
 
@@ -430,7 +452,17 @@ Options:
 
 1:1 mapping — OneNote structure preserved as-is. Only the Recycle Bin is skipped (system folder, not user content).
 
-**No runtime dependencies.** No Python, no Node — conversion is done by you (the agent) natively. The only optional helpers are bundled PowerShell scripts: `export-onenote.ps1` (Windows-only, OneNote COM API) and `format-onenote-xml.ps1` (pretty-printing, see Phase 1.5).
+**Deterministic conversion.** The XML → MD conversion is done by a bundled PowerShell script (`convert-onenote-md.ps1`), not by the agent — agent judgment drifts on long imports (forgot table-cell to-dos, dropped headings, mis-detected types). The script encodes every rule in the [XML → Markdown Conversion Rules](#xml--markdown-conversion-rules) section and ships with built-in fixture regression tests. The agent's job is to **orchestrate and verify**, not to hand-convert pages.
+
+PowerShell is the only runtime (Windows ships PS 5.1; macOS/Linux can use `pwsh`). No Python, no Node.
+
+Bundled scripts (all in `<skill_dir>/tools/`):
+
+| Script | Purpose |
+|--------|---------|
+| `export-onenote.ps1` | Windows-only: export OneNote notebooks to XML via COM |
+| `format-onenote-xml.ps1` | Pretty-print single-line XML into readable multi-line |
+| `convert-onenote-md.ps1` | **XML → MD conversion (all rules scripted) + `-RunSelfTest` fixture tests** |
 
 ### Phase 0 — Platform Detection
 
@@ -452,19 +484,21 @@ If you cannot detect reliably, just ask the user.
 Question: "How to export your OneNote data?"
 Options:
   - "Auto-export (Windows + OneNote desktop)" → runs export-onenote.ps1
-  - "I already have XML files — point me to the path"
+  - "I already have XML files — I'll copy them into {notes_root}/.note2md/import/"
 ```
+
+**Manual imports always go through `{notes_root}/.note2md/import/`** (the directory already exists — it's created at init) — see the macOS/Linux branch below for details.
 
 If auto-export:
 
 ```
 Question: "Export to which directory?"
-Options: "Default ({notes_root}/_import/)" | "Custom path"
+Options: "Default ({notes_root}/.note2md/import/)" | "Custom path"
 ```
 
-The default is inside `{notes_root}` (never the current working directory) so import artifacts never pollute the workspace. If the user picks the default, use `{notes_root}/_import/` — create the directory if missing. If they pick custom, use their path as-is.
+The default is `{notes_root}/.note2md/import/` (inside `{notes_root}`, never the current working directory) so import artifacts never pollute the workspace. If the user picks custom, use their path as-is — but treat that path as user-owned (never delete it).
 
-Run: `powershell -File "<skill_dir>/tools/export-onenote.ps1" -OutputDir "<path>"`
+Run: `powershell -File "<skill_dir>/tools/export-onenote.ps1" -OutputDir "{notes_root}/.note2md/import"`
 Requires Windows + Office 2016+, COM API. The script refuses to run without an explicit `-OutputDir`.
 
 **Verify the export result (mandatory) — never proceed on an unverified export:**
@@ -481,133 +515,67 @@ If the export failed or produced no XML: tell the user what went wrong and fall 
 ```
 Question: "Auto-export isn't available on this system (needs Windows + OneNote desktop). Please export your notebooks to XML yourself, or choose another option:"
 Options:
-  - "I have XML exports (e.g. exported elsewhere) — point me to the path"
+  - "I have XML exports — I'll copy them into {notes_root}/.note2md/import/"
   - "Skip import — start fresh instead"
 ```
 
-If the user points to a path, verify it actually contains XML files before continuing (see the checks above).
+**Manual imports always go through `{notes_root}/.note2md/import/`.** Ask the user to copy their XML exports there (the directory already exists — it's created at init). Then verify the directory actually contains XML files before continuing (see the checks above).
 
 XML exports are plain files — they can come from any machine or tool. What matters: each page is a `.xml` file containing OneNote page XML (namespace `http://schemas.microsoft.com/office/onenote/2013/onenote`), typically named `{PageName}.xml` inside a Notebook/Section folder structure. Accept any path containing such files.
 
-### Phase 1.5 — Pretty-print XML for Reliable Reading
+### Phase 1.5 — (optional) Pretty-print XML for spot-checking
 
-OneNote page XML is often a **single very long line** (tens of thousands of characters per file). Agent file-reading tools truncate long lines, so a raw export cannot be read faithfully — content gets silently dropped during conversion.
+The converter reads raw XML directly — no pretty-printing needed. **This step is only for you when spot-checking** a page whose XML is one very long line (Agent reading tools truncate long lines). If needed:
 
-**Before converting, make sure every `.xml` file is readable in full.** Sample 2–3 files first: if any line exceeds ~2,000 characters, pretty-print the export.
+`powershell -File "<skill_dir>/tools/format-onenote-xml.ps1" -InputDir "<export_dir>"` (`pwsh` on macOS/Linux) → outputs to `<export_dir>_pretty/`. Keep everything under the staging area.
 
-How to pretty-print (choose one):
+### Phase 2 — Convert & Verify (script-driven)
 
-1. **Bundled helper** (Windows, or anywhere `powershell` is available):
-   `powershell -File "<skill_dir>/tools/format-onenote-xml.ps1" -InputDir "<export_dir>"`
-   - Output goes to `<export_dir>_pretty/` by default.
-   - `-InPlace` rewrites the files in place; `-OutputDir "<path>"` writes elsewhere.
-   - Keep everything under the staging area — never write to the workspace root.
-2. **Agent-native** (no script): read each file, parse it, and write it back indented. The bundled script is the reference behavior; a capable agent can do the same thing directly.
+Conversion is fully scripted. Do not hand-convert pages.
 
-Verification after formatting (mandatory):
+1. **Run the converter** against the export:
+   `powershell -File "<skill_dir>/tools/convert-onenote-md.ps1" -InputDir "<xml_dir>" -OutputDir "{notes_root}"` (`pwsh` on macOS/Linux)
+   - Mirrors Notebook → Section → Page structure under `{notes_root}`.
+   - Sanitizes filenames (Windows reserved chars + Unicode specials → `_`), skips Recycle Bin, reports converted count + any failures.
+2. **Verify (mandatory):**
+   - Count check: `*.xml` found == `.md` written.
+   - Spot check 2–3 random pages against their XML (pretty-print first if needed): frontmatter, `# {title}` first line, headings, tables, to-dos, `↳` nesting, OCR text.
+   - Any page the script reported as failed → read the failure list, fix script or source, re-run.
+3. **Report:** "Converted N pages → {notes_root}." (If any failed: "M pages failed — see list above.")
+4. **Ask about cleanup** — after conversion + verification, ask the user (applies to both auto-exported and manually placed XML alike):
 
-1. Re-sample the formatted files — every `<one:OE>` / `<one:T>` line must now be on its own readable line.
-2. Confirm the formatted tree has the same Notebook/Section structure and the same set of `.xml` files as the source (count match).
+   ```
+   Question: "Import complete. Clear the XML files in {notes_root}/.note2md/import/?"
+   Options:
+     - "Yes — delete them"
+     - "No — keep them"
+   ```
 
-Point the conversion step at the pretty-printed copy (or keep the same path if `-InPlace`). The `.xml` → `.md` rules below apply unchanged.
+   Respect the answer either way. `import/` is a staging area, and whether to empty it is the user's call.
 
-### Phase 2 — Convert (agent-native, no scripts)
+> **Why not hand-convert?** On a 500-page import, agent attention decays and rules get forgotten (this has happened: table-cell to-dos dropped, `# {title}` headings missing, `type` misjudged for date-only titles). The script is deterministic; the agent's value is orchestration + verification + judgment on edge cases the script flags.
+>
+> **Sanity-check the script** (one-time, or when in doubt): `convert-onenote-md.ps1 -RunSelfTest` runs built-in fixture regression tests. Every assertion must pass before converting real data.
 
-You do the conversion yourself — this is the core of the import and needs no external tools:
+### Conversion behavior (implemented in `convert-onenote-md.ps1`)
 
-1. Walk the export directory recursively for `*.xml` files. If Phase 1.5 produced a pretty-printed copy, walk **that** copy; otherwise walk the original export.
-2. Preserve the relative folder structure: Notebook → SectionGroup → Section.
-3. Convert each page per the [XML → Markdown Conversion Rules](#xml--markdown-conversion-rules).
-4. Write `{title}.md` (YAML frontmatter + body) into `{notes_root}/`, mirroring the structure.
-5. Avoid overwrites: if a `.md` already exists, append `(2)`, `(3)`, …
-6. Report: "Converted N pages → {notes_root}."
+The full element-by-element mapping lives in the script (with fixture tests). What the script guarantees — and what you verify when spot-checking:
 
-`{notes_root}/_import/` is temporary staging — remind the user to delete it after the import.
+| Behavior | Guarantee |
+|----------|-----------|
+| Frontmatter | `title`/`date`/`type`/`tags: []`; `type` from title **+ section dir name** (date-only titles in e.g. "公司月度例会" → `meeting`) |
+| Body first line | Always `# {title}` |
+| Text | CDATA plain text, embedded `<span>`/`<a>` markup stripped, entities unescaped; link visible text kept |
+| Bold/italic | `**text**` / `*text*` |
+| To-dos | `- [ ]` / `- [x]` |
+| Lists | `-`/`1.`, nested children indent 2 spaces/level |
+| Tables | MD table, `<br>` for cell line breaks, empty rows skipped; **to-dos/lists inside cells** use `[ ]`/`1.`/`-` text markers; **mixed nested trees** inside a cell use `↳` per level |
+| Checklist tables | Single-column to-do tables extracted as native MD lists |
+| Images | OCR text extracted (`[OCR 图片内容]`); no-OCR images → `[图片]` placeholder |
+| Filenames | `\/:*?"<>|` + U+00A0/U+201C/U+201D etc. → `_` |
+| Recycle Bin | Skipped |
 
-### Phase 3 — Verify (mandatory)
-
-Conversion is format mapping, not creative writing. Determinism comes from a hard verification pass — never skip it:
-
-1. **Count check**: number of `*.xml` files found == number of `.md` files written. A mismatch means something was dropped.
-2. **Spot check**: open 2–3 random source XML files and their `.md` outputs; verify title, headings, tables, lists, and to-dos match the rules exactly.
-3. **Failure report**: any page that failed to convert → report its path and reason to the user. Never silently drop.
-4. **Fix and re-verify**: correct any deviation found, then re-run checks 1–2.
-5. **Large imports**: process in batches (e.g. 50 pages at a time) to avoid attention decay; verify each batch before moving on.
-
-Then report: "Converted N pages → {notes_root}." (If any failed, add: "M pages failed — see list above.")
-
-### XML → Markdown Conversion Rules
-
-Apply page by page, mechanically. This is format conversion, not creative writing — follow the tables exactly. Do not add, omit, rewrite, or "improve" content. If something does not match any rule, note it and ask — do not guess.
-
-**Frontmatter**
-
-| Field | Source |
-|-------|--------|
-| `title` | `<one:Page name="...">` attribute; fallback: text of first `<one:Title/one:OE>`; last resort: filename |
-| `date` | `dateTime` or `lastModifiedTime` attribute, take `YYYY-MM-DD`; fallback: today |
-| `type` | Heuristic from title/content: `meeting` (例会/会议/meeting/review), `daily` (日记/daily/journal), `task` (待办/todo/action item), else `note` |
-| `tags` | `[]` |
-
-**Body — element mapping**
-
-| OneNote element | Markdown output |
-|-----------------|-----------------|
-| Text — collect all `<one:T>` descendants | plain text; strip embedded HTML `<span>` tags, unescape entities |
-| `<one:OE bold="1">` / `italic="1"` | `**text**` / `*text*` (both → `***text***`) |
-| Heading (`quickStyleIndex` or `style` containing "heading") | `#` × min(level, 6) |
-| To-do — `<one:Tag index="0">` | `- [ ] ` unchecked |
-| To-do — `<one:Tag index="1">` | `- [x] ` checked |
-| List — `<one:List>` present, or `<one:Tag>` with other index | `- ` bullet; nested `<one:OE>` children indent 2 spaces per level |
-| `<one:Table>` → `<one:Row>` → `<one:Cell>` | Markdown table; line breaks inside a cell → `<br>`; skip fully empty rows |
-
-**To-dos inside table cells** — GFM table cells cannot contain Markdown task lists (`- [ ]` inside a cell is not valid and loses the checkbox). When a to-do `<one:Tag index="0|1">` appears **inside a `<one:Cell>`**, keep the table structure and use a **text marker** instead of a list:
-
-| Cell content | Markdown output |
-|---|---|
-| `<one:Tag index="0">` + text in a cell | `[ ] text` |
-| `<one:Tag index="1">` + text in a cell | `[x] text` |
-| Multiple `<one:OE>` in one cell | Join with `<br>`, prefix each to-do OE with its `[ ]` / `[x]` marker |
-
-Example: a cell containing two OEs — plain text then an unchecked to-do — becomes `plain text<br>[ ] action item`.
-
-**Lists (ordered/unordered) inside table cells** — the same constraint applies to any list inside a cell: `<one:Number>` (ordered), `<one:Bullet>` (unordered), and `<one:Tag>` all cannot render as native Markdown lists inside a cell. Use text markers too:
-
-| Cell content | Markdown output |
-|---|---|
-| Ordered item — `<one:List><one:Number text="1.">` + text | `1. text` (use the `text` attribute, fallback to auto-numbering from 1) |
-| Unordered item — `<one:List><one:Bullet>` + text | `- text` (literal dash + space, NOT a list) |
-| Nested `<one:OEChildren>` inside a cell | indent with **2 spaces per level**, same as outside tables |
-
-**Mixed nested trees inside a cell** — when a cell contains a multi-level tree mixing to-dos, ordered items, and plain text (very common in OneNote — e.g. a 2-column table whose content column holds a whole task tree), render the tree **inline inside the cell** as a text tree using `↳` (U+21B3) at each nesting level:
-
-- Top-level items are joined by `<br>`.
-- Each nesting level is prefixed by `↳ ` (one `↳` per level, with a leading space per level).
-- Markers are kept: `[ ]`/`[x]` for to-dos, `1.`/`2.` or the literal `text` attribute for ordered, `-` for unordered.
-- Cell content that is only plain text stays as-is.
-
-Example — a cell containing:
-```
-[ ] I17情况追踪
-  ↳ [x] 基本情况与进度
-  ↳ [ ] 测试阶段
-[x] 2026年IT预算
-```
-becomes: `[ ] I17情况追踪<br>↳ [x] 基本情况与进度<br>↳ [ ] 测试阶段<br>[x] 2026年IT预算`
-
-When a whole row (or the whole table) is just a list/tree with no real tabular structure (e.g. a single column of to-dos used as a checklist), the agent **may** extract it from the table and render it as a native Markdown list below the table, keeping a stub cell in the table — flag this in the final report.
-
-**Fallback — anything not covered above:** if a cell contains a structure none of the rules above handle, do NOT guess or drop content. Export conservatively: a plain Markdown table cell with **every text fragment joined by `<br>`**, in source order, stripping only markup. The goal is zero text loss — every word stays inside the table even if the structure flattens. Note the cell in the final report as "fallback-rendered".
-| `<one:Image>` | skip (not extracted yet) |
-
-Structure notes:
-
-- `<one:OEChildren>` is a wrapper — recurse into it, emit nothing.
-- An `<one:OE>` that only contains `Table`/`OEChildren` emits nothing itself.
-- Skip Recycle Bin content (`OneNote_RecycleBin`, `isRecycleBin="true"`).
-- Body starts with `# {title}`.
-- Filenames: replace `\/:*?"<>|` with `_`.
-- Collapse 3+ blank lines to 2; strip trailing whitespace.
+Any structure the script can't map → it falls back conservatively (text joined by `<br>`, zero loss) and reports it.
 
 **Loss matrix:** images, attachments, hyperlinks, ink, math, audio, and video are intentionally not converted. Full breakdown: `docs/onenote-loss-matrix.md` in the plugin repo.
 

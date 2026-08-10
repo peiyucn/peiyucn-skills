@@ -1,6 +1,6 @@
 ---
 name: archive
-description: Archive a notebook, section, or single page to _archive/
+description: Archive a notebook, section, or single page to .note2md/archive/
 argument-hint: [target]
 ---
 

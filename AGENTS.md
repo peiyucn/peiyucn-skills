@@ -39,7 +39,7 @@ peiyucn-skills/                          — 仓库根 = 市场
 
 ## 开发
 
-本仓库无 CI / 无构建（总规范口径）。开发约定：
+本仓库无 CI / 无构建（纯内容仓库，无 pipeline）。开发约定：
 
 * **薄壳原则**：`commands/` 只做委托，不重复维护逻辑
 * **统一 frontmatter**：命令文件使用同一套 YAML frontmatter（`name` + `description` + `argument-hint`）。多余字段被各平台静默忽略，不报错

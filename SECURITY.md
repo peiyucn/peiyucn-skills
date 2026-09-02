@@ -2,7 +2,7 @@
 
 ## 支持版本 / Supported Versions
 
-仅支持最新 master 分支内容。/ Only the 最新 master 分支内容 is supported.
+仅支持最新 main 分支内容。/ Only the 最新 main 分支内容 is supported.
 
 ## 报告漏洞 / Reporting a Vulnerability
 

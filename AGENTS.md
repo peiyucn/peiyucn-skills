@@ -55,7 +55,7 @@ peiyucn-skills/                          — 仓库根 = 市场
   * ✅ 该提交 — 用户明确说「好了」「可以了」「提交吧」
   * ❌ 先别交 — 还在讨论/探索/收集需求，方向未定
   * ❌ 先别交 — 中途打断、单轮改动不完整、留了 TODO 没处理
-* **分支同步**：`push` 到 `dev` 后**必须**同步 `master`（`git push origin dev:master`）。Copilot Chat 市场安装拉的是 `master`，不同步会导致用户安装到旧版本
+* **分支同步**：`push` 到 `dev` 后**必须**同步 `main`（`git push origin dev:main`）。Copilot Chat 市场安装拉的是 `main`，不同步会导致用户安装到旧版本
 * **版本号与 push 强绑定**：**凡是 `push`，`plugin.json` 与 `marketplace.json` 的 `version` 字段必须同步更新**。市场按版本号识别更新，只改代码不改版本号会导致用户装到旧版缓存。例外：**未 push 的本地测试**可先不改版本号，测试通过、准备发布时才 bump + push
 * **commit 前检查工程文件**：任何涉及行为/结构的改动，commit 前必须检查以下文件是否需要同步调整：
   * `README.md` / `README.zh-CN.md` — 功能描述、命令列表、导入说明
@@ -71,7 +71,7 @@ peiyucn-skills/                          — 仓库根 = 市场
   ```
 
   * 版本规则：`fix` → patch（0.2.0 → 0.2.1）；`feat` → minor（0.2.0 → 0.3.0）；破坏性变更 → major
-  * 流程：bump 版本号 → commit → push dev → push dev:master → 打 tag → push tag，**一个版本一个 commit，版本号与代码同批推送**
+  * 流程：bump 版本号 → commit → push dev → push dev:main → 打 tag → push tag，**一个版本一个 commit，版本号与代码同批推送**
 
 ### GitHub 操作（gh cli）
 

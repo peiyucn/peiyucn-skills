@@ -1,9 +1,5 @@
 # 项目指令 — peiyucn-skills
 
-## 语言
-
-* **始终用简体中文回复**
-
 ## 项目概况
 
 仓库根即**市场（marketplace）**，插件放在 `plugins/` 下：

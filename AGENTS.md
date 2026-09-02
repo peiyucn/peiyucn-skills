@@ -47,7 +47,7 @@ peiyucn-skills/                          — 仓库根 = 市场
 
 ## Git 与发布
 
-通用流程（dev 开发、逐项提交、中文描述 + 英文类型前缀）按总规范《统一开发流程》；本仓库额外约定：
+通用流程（自含）：日常开发在 `dev`、逐项提交、中文描述 + 英文类型前缀（feat:/fix:/refactor:/chore:/docs: 等）、不确定的事直接说"不确定"；本仓库额外约定：
 
 * **可用类型**：`feat` `fix` `refactor` `chore` `docs` `style` `perf` `build` `revert`（例：`feat: 新增命令自动补全`、`fix: 修复模板排序`、`docs: 补充命令交互流程文档`）
 * **提交时机**：每轮对话结束时，Agent 自行判断是否 `git commit` + `git push`，无需等用户发指令：
@@ -75,7 +75,7 @@ peiyucn-skills/                          — 仓库根 = 市场
 
 ### GitHub 操作（gh cli）
 
-* 本机已安装并登录 **gh cli**（账号 `peiyucn`，https 协议，凭据存 keyring），GitHub 操作一律走 `gh`（总规范同），Agent 可直接使用，无需等用户手动操作
+* 本机已安装并登录 **gh cli**（账号 `peiyucn`，https 协议，凭据存 keyring），GitHub 操作一律走 `gh`，Agent 可直接使用；`gh api` 直连、`git push/fetch` 需要代理 127.0.0.1:7897
 * 本仓库远程：`https://github.com/peiyucn/peiyucn-skills.git`（原名 pyskills，再往前是 note2md，已两次改名）
 * 常用操作：
   * 仓库改名：`gh repo rename <新名> --repo peiyucn/peiyucn-skills --yes`

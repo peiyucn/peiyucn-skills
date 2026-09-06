@@ -1,4 +1,4 @@
-﻿# peiyucn-skills — Agent Skills Marketplace
+# peiyucn-skills — Agent Skills Marketplace
 
 [简体中文](README.zh-CN.md) | English | [GitHub](https://github.com/peiyucn/peiyucn-skills)
 
@@ -65,6 +65,21 @@ Use `/note2md init` to import your existing OneNote notebooks. Text content — 
 Result: `notes/` mirrors your original Notebook → Section → Page structure. After the import, you'll be asked whether to clear the temporary import files.
 
 > **Known limitations:** images, file attachments, hyperlinks, ink/drawings, math, audio, and video are **not** extracted yet (see [docs/onenote-loss-matrix.md](docs/onenote-loss-matrix.md) for the full breakdown). Only text-based content is guaranteed.
+
+### obscura-web 🌐
+
+Web fetching, scraping, and stateful browser sessions on the local **Obscura** engine — a Rust headless browser (embedded V8, no Chromium). JS-rendered pages come back as clean Markdown, batch scraping runs in parallel, and multi-step flows (login → paginate → extract) keep state through the built-in MCP server.
+
+> **Platform note:** Windows-first. The PowerShell install/service helpers are Windows-only; on macOS/Linux install the official binary from the [Obscura releases](https://github.com/h4ckf0r0day/obscura/releases) and run `obscura fetch` / `obscura mcp` directly.
+
+#### Commands
+
+| Command | What it does |
+|---------|-------------|
+| `/obscura-web help` | Quick-start guide |
+| `/obscura-web install` | Install/upgrade the Obscura engine binary |
+| `/obscura-web fetch <url>` | Fetch a page as rendered Markdown (JS-heavy pages included) |
+| `/obscura-web browse <cmd>` | Stateful session: navigate, snapshot, click, fill, extract |
 
 ## License
 

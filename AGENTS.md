@@ -24,6 +24,17 @@ peiyucn-skills/                          — 仓库根 = 市场
 │           ├── export-onenote.ps1     — OneNote 自动导出（Windows + COM API，可选）
 │           ├── format-onenote-xml.ps1 — XML 排版为多行缩进（抽查用，可选）
 │           └── convert-onenote-md.ps1 — XML→MD 确定性转换（核心，含 fixture 自测）
+├── plugins/obscura-web/           — 市场下的插件（插件名 obscura-web，命令命名空间 /obscura-web:xxx）
+│   ├── commands/                  — 命令薄壳（4 个 .md：fetch / browse / install / help）
+│   ├── .claude-plugin/
+│   │   └── plugin.json            — 插件清单
+│   ├── SKILL-CN.md                — SKILL.md 中文对照（仅供作者）
+│   └── skills/obscura-web/
+│       ├── SKILL.md               — **单一真相来源**：抓取/批量/会话三种姿势 + 已知坑；脚本路径用 {SKILL_DIR} 相对约定
+│       └── scripts/
+│           ├── install-obscura.ps1 — Obscura 引擎安装/升级（Windows，幂等，直连失败走代理）
+│           ├── obscura-serve.ps1   — MCP(8080)/CDP(9223) 服务管理（Windows；9222 勿碰）
+│           └── browse/             — Node 助手：browse-mcp.js 会话客户端 / browse.js 单步 CDP（node_modules 不入库）
 ```
 
 ### 关键文件
@@ -33,6 +44,8 @@ peiyucn-skills/                          — 仓库根 = 市场
 | `.claude-plugin/marketplace.json` | 市场货架清单。`name` 即市场名（peiyucn-skills），插件条目声明 `source: ./plugins/note2md`；多余字段被各平台静默忽略 |
 | `docs/agent-compatibility.md` | 三平台兼容性分析与决策记录（市场/插件安装/命令注册机制） |
 | `plugins/note2md/skills/note2md/SKILL.md` | **核心**：所有 8 个命令的完整交互流程。是唯一需要维护逻辑的地方 |
+| `plugins/obscura-web/skills/obscura-web/SKILL.md` | **核心**：抓取（fetch/scrape）/会话（MCP）/原生 CDP 三种姿势与已知坑；脚本路径 {SKILL_DIR} 相对约定 |
+| `plugins/obscura-web/SKILL-CN.md` | SKILL.md 中文同步翻译，仅供作者对照。**修改 SKILL.md 时必须同步更新** |
 | `plugins/note2md/SKILL-CN.md` | SKILL.md 的中文同步翻译，仅供作者对照。**修改 SKILL.md 时必须同步更新** |
 | `plugins/note2md/commands/*.md` | 薄壳——仅含 frontmatter（name + description + argument-hint）+ 一句委托指令 |
 | `plugins/note2md/.claude-plugin/plugin.json` | 插件清单，声明 commands 路径；skills 目录自动发现 |
@@ -54,7 +67,7 @@ peiyucn-skills/                          — 仓库根 = 市场
 * **验证**：无构建验证——提交前自查「commit 前检查工程文件」清单
 * **提交**：逐项提交，中文描述 + 英文类型前缀；可用类型 `feat` `fix` `refactor` `chore` `docs` `style` `perf` `build` `revert`（例：`feat: 新增命令自动补全`、`fix: 修复模板排序`、`docs: 补充命令交互流程文档`）；不确定的事直接说"不确定"，禁止编造事实性信息。**提交时机**：每轮对话结束时自行判断——独立完成一个功能/修复/重构且改动原子可回溯，或用户明确说「好了」「提交吧」→ 提交；还在讨论/探索、方向未定、中途打断、留了 TODO 未处理 → 先不交
 * **推送**：`git push/fetch` 需要代理 127.0.0.1:7897；push 到 `dev` 后**必须**同步 `main`（`git push origin dev:main`）——Copilot Chat 市场安装拉的是 `main`，不同步会导致用户安装到旧版本；**版本号与 push 强绑定**：凡是 push，`plugin.json` 与 `marketplace.json` 的 `version` 字段必须同步更新——市场按版本号识别更新，只改代码不改版本号会导致用户装到旧版缓存；例外：未 push 的本地测试可先不改版本号，准备发布时才 bump + push
-* **发布**：每个 push 的版本**必须**打 tag（`git tag -a v{version} -m "v{version}: {简要说明}"` + `git push origin v{version}`）；版本规则：`fix` → patch（0.2.0 → 0.2.1）、`feat` → minor（0.2.0 → 0.3.0）、破坏性变更 → major；流程：bump 版本号 → commit → push dev → push dev:main → 打 tag → push tag，**一个版本一个 commit，版本号与代码同批推送**
+* **发布**：每个 push 的版本**必须**打 tag；**多插件仓库 tag 一律插件前缀**（`git tag -a {plugin}-v{version} -m "{plugin}-v{version}: {简要说明}"` + `git push origin {plugin}-v{version}`，例 `obscura-web-v0.1.0`；无前缀的 `v0.1.0` 已被 note2md 时期占用，禁止再用无前缀 tag）；版本规则：`fix` → patch（0.2.0 → 0.2.1）、`feat` → minor（0.2.0 → 0.3.0）、破坏性变更 → major；流程：bump 该插件在 plugin.json 与 marketplace.json 的 version → commit → push dev → push dev:main → 打 tag → push tag，**一个版本一个 commit，版本号与代码同批推送**
 * **commit 前检查工程文件**：任何涉及行为/结构的改动，commit 前必须检查以下文件是否需要同步调整：
   * `README.md` / `README.zh-CN.md` — 功能描述、命令列表、导入说明
   * `CONTRIBUTING.md` / `CONTRIBUTING.zh-CN.md` — 项目结构树、分支策略

@@ -15,7 +15,7 @@ Workflow: `dev` → feature branch → PR → `dev` → (when ready) → `main`.
 ```
 peiyucn-skills/                              # Repo root = marketplace
 ├── .claude-plugin/marketplace.json    # Marketplace registry (name: peiyucn-skills)
-├── plugins/note2md/                   # Plugin shipped by this marketplace
+├── plugins/note2md/                   # Plugin: Markdown note management
 │   ├── .claude-plugin/plugin.json     # Plugin metadata
 │   ├── commands/                      # Slash-command stubs (thin shells)
 │   ├── SKILL-CN.md                    # Chinese reference for the author (not loaded by agents)
@@ -24,7 +24,18 @@ peiyucn-skills/                              # Repo root = marketplace
 │       ├── templates/                 # Built-in page templates
 │       └── tools/
 │           ├── export-onenote.ps1     # OneNote COM export (Windows; optional)
+│           ├── convert-onenote-md.ps1 # XML → Markdown conversion (core)
 │           └── format-onenote-xml.ps1 # XML pretty-printing (optional; before import)
+├── plugins/obscura-web/               # Plugin: web fetching & browser automation (Obscura)
+│   ├── .claude-plugin/plugin.json     # Plugin metadata
+│   ├── commands/                      # Slash-command stubs (thin shells)
+│   ├── SKILL-CN.md                    # Chinese reference for the author (not loaded by agents)
+│   └── skills/obscura-web/
+│       ├── SKILL.md                   # Agent behavior — fetch/scrape/session logic
+│       └── scripts/
+│           ├── install-obscura.ps1    # Engine install/upgrade (Windows)
+│           ├── obscura-serve.ps1      # MCP & CDP service management (Windows)
+│           └── browse/                # Node helpers (puppeteer-core / MCP client)
 
 > `notes/` and `.note2md/` are user-space — they do not live in this repo.
 > `test/` is a scratch directory for manual testing — gitignored.

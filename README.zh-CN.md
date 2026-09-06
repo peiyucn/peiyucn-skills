@@ -76,6 +76,21 @@ Markdown 笔记，按笔记本→分区→页面三层结构组织，通过斜�
 
 >   已知限制：   图片、文件附件、超链接、墨迹/绘图、公式、音频、视频频频暂不提取频频（完整清单见 [docs/onenote-loss-matrix.md](docs/onenote-loss-matrix.md)）。仅保证文本类内容。
 
+### obscura-web 🌐
+
+基于本地 **Obscura** 引擎（Rust 无头浏览器，内嵌 V8，无 Chromium）的网页抓取与浏览器会话。JS 渲染页面直接输出干净 Markdown，批量抓取并行执行，多步流程（登录→翻页→提取）通过内置 MCP 服务保持会话状态。
+
+> 平台说明：Windows 优先。安装/服务管理脚本为 Windows PowerShell；macOS/Linux 从 [Obscura releases](https://github.com/h4ckf0r0day/obscura/releases) 安装官方二进制后直接运行 `obscura fetch` / `obscura mcp`。
+
+#### 命令
+
+| 命令 | 功能 |
+|------|------|
+| `/obscura-web help` | 快速入门指南 |
+| `/obscura-web install` | 安装/升级 Obscura 引擎二进制 |
+| `/obscura-web fetch <url>` | 抓取页面并输出渲染后 Markdown（含 JS 重页面） |
+| `/obscura-web browse <命令>` | 会话模式：导航、快照、点击、填表、提取 |
+
 ## License
 
 MIT

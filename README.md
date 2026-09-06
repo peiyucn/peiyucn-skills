@@ -72,6 +72,8 @@ Web fetching, scraping, and stateful browser sessions on the local **Obscura** e
 
 > **Platform note:** Windows-first. The PowerShell install/service helpers are Windows-only; on macOS/Linux install the official binary from the [Obscura releases](https://github.com/h4ckf0r0day/obscura/releases) and run `obscura fetch` / `obscura mcp` directly.
 
+> **After installing the plugin, run `/obscura-web install` once.** The plugin ships instructions and scripts only — the Obscura engine binary (~160 MB) is downloaded to `~/.obscura/bin/`, shared by all your agents, and survives plugin updates. Upgrade any time by re-running the command (or `-Force`).
+
 #### Commands
 
 | Command | What it does |

@@ -16,7 +16,14 @@
 
 ## 前置条件
 
-- **Windows（主要）**：跑一次 `scripts/install-obscura.ps1`——把二进制装到 `~/.obscura/bin/`。`fetch`/`scrape` 不需要 Chrome 或 Node。
+> **先装引擎——这是装完本插件后必须做的一步。**
+> 插件本体只含指令与辅助脚本；Obscura 引擎二进制（约 160MB）**不随市场打包**（市场格式没有安装钩子）。装完插件后运行 **`/obscura-web install`**（Windows 上也可直接跑 `scripts/install-obscura.ps1`）。
+
+- 二进制落位 **`~/.obscura/bin/`**——特意放在插件目录之外的**共享用户级目录**：
+  - 一份引擎服务你所有 agent（DSH / Claude Code / Codex / Copilot）+ 一个常驻 MCP 服务；
+  - 平台的插件缓存会在更新时重拷/清理——引擎不受影响；
+  - 引擎升级与插件版本解耦（`-Force` 重装即可）。
+- **Windows（主要）**：`fetch`/`scrape` 不需要 Chrome 或 Node。
 - **Node.js 20+** 仅会话助手 `scripts/browse/` 需要（在该目录跑一次 `npm install`）。
 - **macOS / Linux**：从[官方 releases 页](https://github.com/h4ckf0r0day/obscura/releases)装二进制——见「其他平台」。
 - 变体：`render`（渲染，默认）/ `stealth`（渲染 + 反指纹 + 拦截 3520 个追踪域名）/ `no-render`（最轻）/ `no-render-stealth`。

@@ -20,7 +20,14 @@ Use the local **Obscura** engine (Rust headless browser, embedded V8, no Chromiu
 
 ## Prerequisites
 
-- **Windows (primary)**: run `scripts/install-obscura.ps1` once — installs the binary to `~/.obscura/bin/`. No Chrome or Node needed for `fetch`/`scrape`.
+> **Install the engine first — one required step after installing this plugin.**
+> The plugin ships instructions and helper scripts only; the Obscura engine binary (~160 MB) is **not** bundled with the marketplace (marketplace formats have no install hooks). Run **`/obscura-web install`** (or `scripts/install-obscura.ps1` directly on Windows).
+
+- The binary lands in **`~/.obscura/bin/`** — a shared, per-user location *outside* the plugin directory, on purpose:
+  - one engine copy serves every agent you use (DSH, Claude Code, Codex, Copilot) and one resident MCP service;
+  - platform plugin caches get re-copied and cleaned on plugin updates — the engine survives them;
+  - engine upgrades are decoupled from plugin versions (reinstall with `-Force`).
+- **Windows (primary)**: no Chrome or Node needed for `fetch`/`scrape`.
 - **Node.js 20+** only for the session helper under `scripts/browse/` (run `npm install` there once).
 - **macOS / Linux**: install the official binary from the [releases page](https://github.com/h4ckf0r0day/obscura/releases) — see "Other platforms".
 - Variants: `render` (rendering, default) / `stealth` (rendering + anti-fingerprint + blocks 3,520 tracker domains) / `no-render` (lightest) / `no-render-stealth`.

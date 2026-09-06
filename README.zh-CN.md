@@ -82,6 +82,8 @@ Markdown 笔记，按笔记本→分区→页面三层结构组织，通过斜�
 
 > 平台说明：Windows 优先。安装/服务管理脚本为 Windows PowerShell；macOS/Linux 从 [Obscura releases](https://github.com/h4ckf0r0day/obscura/releases) 安装官方二进制后直接运行 `obscura fetch` / `obscura mcp`。
 
+> **装完插件后先跑一次 `/obscura-web install`。** 插件本体只含指令与脚本——Obscura 引擎二进制（约 160MB）会下载到 `~/.obscura/bin/`，所有 agent 共用一份，且不随插件更新被清理。随时重跑该命令（或 `-Force`）升级。
+
 #### 命令
 
 | 命令 | 功能 |

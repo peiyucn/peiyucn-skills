@@ -11,3 +11,6 @@ notes/
 .DS_Store
 Thumbs.db
 test/
+
+# Node dependencies for plugin helper scripts (installed locally)
+node_modules/

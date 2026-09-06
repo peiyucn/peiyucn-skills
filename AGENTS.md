@@ -66,8 +66,8 @@ peiyucn-skills/                          — 仓库根 = 市场
 * **开发**：日常改动在 `dev`；`main` 供市场安装拉取（Copilot Chat 市场装 `main`）
 * **验证**：无构建验证——提交前自查「commit 前检查工程文件」清单
 * **提交**：逐项提交，中文描述 + 英文类型前缀；可用类型 `feat` `fix` `refactor` `chore` `docs` `style` `perf` `build` `revert`（例：`feat: 新增命令自动补全`、`fix: 修复模板排序`、`docs: 补充命令交互流程文档`）；不确定的事直接说"不确定"，禁止编造事实性信息。**提交时机**：每轮对话结束时自行判断——独立完成一个功能/修复/重构且改动原子可回溯，或用户明确说「好了」「提交吧」→ 提交；还在讨论/探索、方向未定、中途打断、留了 TODO 未处理 → 先不交
-* **推送**：`git push/fetch` 需要代理 127.0.0.1:7897；push 到 `dev` 后**必须**同步 `main`（`git push origin dev:main`）——Copilot Chat 市场安装拉的是 `main`，不同步会导致用户安装到旧版本；**版本号与 push 强绑定**：凡是 push，`plugin.json` 与 `marketplace.json` 的 `version` 字段必须同步更新——市场按版本号识别更新，只改代码不改版本号会导致用户装到旧版缓存；例外：未 push 的本地测试可先不改版本号，准备发布时才 bump + push
-* **发布**：每个 push 的版本**必须**打 tag；**多插件仓库 tag 一律插件前缀**（`git tag -a {plugin}-v{version} -m "{plugin}-v{version}: {简要说明}"` + `git push origin {plugin}-v{version}`，例 `obscura-web-v0.1.0`；无前缀的 `v0.1.0` 已被 note2md 时期占用，禁止再用无前缀 tag）；版本规则：`fix` → patch（0.2.0 → 0.2.1）、`feat` → minor（0.2.0 → 0.3.0）、破坏性变更 → major；流程：bump 该插件在 plugin.json 与 marketplace.json 的 version → commit → push dev → push dev:main → 打 tag → push tag，**一个版本一个 commit，版本号与代码同批推送**
+* **推送**：`git push/fetch` 需要代理 127.0.0.1:7897；push 到 `dev` 后**必须**同步 `main`（`git push origin dev:main`）——Copilot Chat 市场安装拉的是 `main`，不同步会导致用户安装到旧版本；**版本号与 push 强绑定**：凡是 push，两个插件的 `plugin.json` 与 `marketplace.json`（两个条目）的 `version` 必须同步更新——市场按版本号识别更新，只改代码不改版本号会导致用户装到旧版缓存；例外：未 push 的本地测试可先不改版本号，准备发布时才 bump + push
+* **发布**：**版本线 = 市场级统一版本，两个插件同号、同批 bump**（当前 0.6.0）；每个 push 的版本**必须**打 tag（`git tag -a v{version} -m "v{version}: {简要说明}"` + `git push origin v{version}`，接续无前缀历史线 v0.1.0–v0.5.1；过渡期的插件前缀 tag 保留不动，不再新增）；版本规则：`fix` → patch（0.6.0 → 0.6.1）、`feat` → minor（0.6.0 → 0.7.0）、破坏性变更 → major；流程：bump 两个 `plugin.json` + `marketplace.json` 两个条目的 version（同号）→ commit → push dev → push dev:main → 打 tag → push tag，**一个版本一个 commit，版本号与代码同批推送**
 * **commit 前检查工程文件**：任何涉及行为/结构的改动，commit 前必须检查以下文件是否需要同步调整：
   * `README.md` / `README.zh-CN.md` — 功能描述、命令列表、导入说明
   * `CONTRIBUTING.md` / `CONTRIBUTING.zh-CN.md` — 项目结构树、分支策略

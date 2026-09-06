@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "note2md",
-      "version": "0.5.2",
+      "version": "0.6.0",
       "description": "Markdown note management with Notebook→Section→Page hierarchy and unified slash commands. Import from OneNote, auto-learn templates from your notes, archive old content. Works with any agent — Copilot, Claude Code, or Codex.",
       "source": "./plugins/note2md",
       "category": "productivity",
@@ -18,7 +18,7 @@
     },
     {
       "name": "obscura-web",
-      "version": "0.1.1",
+      "version": "0.6.0",
       "description": "Web fetching, scraping, and stateful browser sessions on the local Obscura engine (Rust headless browser, no Chromium). JS-rendered pages as clean Markdown, parallel batch scraping, screenshots/PDF, and multi-step sessions via its MCP server. Windows-first; macOS/Linux install the official binary.",
       "source": "./plugins/obscura-web",
       "category": "developer-tools",

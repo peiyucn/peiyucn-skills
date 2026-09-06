@@ -1,6 +1,6 @@
 {
   "name": "note2md",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Agent-native Markdown note management with Notebook→Section→Page hierarchy. Slash commands: init, newnotebook, newpage, newtemplate, archive, securecheck, and more — all under the note2md namespace. Smart templates learned from your own notes. OneNote import support. Context-safe archiving.",
   "commands": "./commands",
   "author": {

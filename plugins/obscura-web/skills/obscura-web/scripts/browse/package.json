@@ -4,6 +4,6 @@
   "type": "module",
   "description": "Obscura CDP 会话助手（obscura-web skill 内部依赖，不发布）",
   "dependencies": {
-    "puppeteer-core": "^23.11.1"
+    "puppeteer-core": "^25.10.0"
   }
 }

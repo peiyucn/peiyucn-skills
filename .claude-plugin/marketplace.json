@@ -18,7 +18,7 @@
     },
     {
       "name": "obscura-web",
-      "version": "0.1.2",
+      "version": "0.1.3",
       "description": "Web fetching, scraping, and stateful browser sessions on the local Obscura engine (Rust headless browser, no Chromium). JS-rendered pages as clean Markdown, parallel batch scraping, screenshots/PDF, and multi-step sessions via its MCP server. Windows-first; macOS/Linux install the official binary.",
       "source": "./plugins/obscura-web",
       "category": "developer-tools",

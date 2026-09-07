@@ -89,7 +89,7 @@ peiyucn-skills/                          — 仓库根 = 市场
 ├── .claude-plugin/
 │   └── marketplace.json           — 市场货架清单（name: peiyucn-skills；三平台均识别此路径）
 ├── plugins/note2md/               — 市场下的插件
-│   ├── commands/                  — 8 个命令薄壳（三平台唯一命令来源）
+│   ├── commands/                  — 9 个命令薄壳（三平台唯一命令来源）
 │   ├── .claude-plugin/
 │   │   └── plugin.json            — 插件清单（声明 commands；skills 目录自动发现）
 │   └── skills/note2md/

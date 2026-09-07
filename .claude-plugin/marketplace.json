@@ -10,8 +10,8 @@
   "plugins": [
     {
       "name": "note2md",
-      "version": "0.5.3",
-      "description": "Markdown note management with Notebook→Section→Page hierarchy and unified slash commands. Import from OneNote, auto-learn templates from your notes, archive old content. Works with any agent — Copilot, Claude Code, or Codex.",
+      "version": "0.6.0",
+      "description": "Markdown note management with Notebook→Section→Page hierarchy and unified slash commands. Import from OneNote, auto-learn templates from your notes, archive old content, and generate an AGENTS.md workspace manifest. Works with any agent — Copilot, Claude Code, or Codex.",
       "source": "./plugins/note2md",
       "category": "productivity",
       "tags": ["notes", "markdown", "onenote", "migration", "knowledge-management", "productivity"]

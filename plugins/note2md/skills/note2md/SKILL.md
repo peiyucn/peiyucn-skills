@@ -1,6 +1,6 @@
 ---
 name: note2md
-description: "Agent-native Markdown note management with Notebook→Section→Page hierarchy. Slash commands: help, init, newnotebook, newsection, newpage (template-first), newtemplate, securecheck, archive. Plugin ships with daily, meeting, and quick-note templates; user templates take priority. Use when the user wants to manage notes, create a notebook/section/page, import from OneNote, or archive old notes."
+description: "Agent-native Markdown note management with Notebook→Section→Page hierarchy. Slash commands: help, init, newnotebook, newsection, newpage (template-first), newtemplate, securecheck, archive, agentsmd. Plugin ships with daily, meeting, and quick-note templates; user templates take priority. Use when the user wants to manage notes, create a notebook/section/page, import from OneNote, archive old notes, or write/refresh the AGENTS.md workspace manifest."
 ---
 
 # note2md — Agent-Native Markdown Note Management
@@ -33,13 +33,14 @@ You are the interface to the user's note system. All notes use the same **Notebo
 | Command | What it does |
 |---------|-------------|
 | `help` | Show this quick-start guide |
-| `init` | Setup wizard — pick language, choose root path, import or start fresh |
+| `init` | Setup wizard — pick language, choose root path, import or start fresh, then write an `AGENTS.md` workspace manifest at the notes root |
 | `newnotebook [name]` | Create a notebook under `{notes_root}` |
 | `newsection [notebook] [section]` | Create a section inside a notebook |
 | `newpage` | Create a page — pick template or blank, ask destination, build it |
 | `newtemplate` | Extract a template from a section of similar pages |
 | `securecheck` | Scan notes for sensitive info (passwords, IDs, bank cards, tokens) |
 | `archive` | Archive a notebook, section, or single page |
+| `agentsmd` | Write or refresh `AGENTS.md` — the workspace manifest at the notes root |
 
 ***
 
@@ -53,10 +54,11 @@ When the user types `help`, reply with a concise guide in their chosen language 
 Commands:
   init           First-time setup (import OneNote or start fresh)
   newnotebook    Create a new notebook
-  newsection     Create a section inside a notebook  
+  newsection     Create a section inside a notebook
   newpage        Write a note (pick a template — diary, meeting, quick note, or blank)
-  newtemplate    Extract a template from a section of similar notes
+  newtemplate    Extract a template from any section with similar pages
   archive        Clean up old notebooks, sections, or pages
+  agentsmd       Write or refresh AGENTS.md — your workspace manifest
 
 First time?
   Type init to import your OneNote or create your first notebook.
@@ -74,6 +76,11 @@ OneNote?
 
 Security?
   securecheck checks your notes for passwords, ID numbers, bank cards, and API tokens.
+
+AGENTS.md?
+  Every future session (any agent) reads it before touching your notes.
+  init writes it automatically; agentsmd writes or refreshes it anytime, and asks
+  which sections to include. Edit it by hand whenever you like.
 
 Questions? Just ask — you don't need to memorize commands.
 
@@ -180,9 +187,16 @@ After import, tell the user: "Import complete. Use `newtemplate` on any section 
 4. Create `{notes_root}/{Notebook}/{Section}/`
 5. Confirm: "All set! '{Notebook}' and 'Quick Notes' created. Use `newpage` to write your first note."
 
-### Step 3 — Done
+### Step 3 — Done: Write AGENTS.md
 
-Setup complete. The resolved `{notes_root}` is used for all subsequent operations.
+Setup completes by running the [`agentsmd` flow](#agentsmd--write-or-refresh-agentsmd), which writes `{notes_root}/AGENTS.md` — a durable record of what was decided during init, so **any future session, in any agent, starts with the same context** (the session running init will not be the last one to touch these notes).
+
+When delegating from init:
+
+- **Skip its notes-root and language resolution** — `{notes_root}` is already resolved (Step 1) and the language was chosen (Step 0); reuse both.
+- Map init answers onto the manifest: language → **Init recap · Language**; mode + result → **Init recap · OneNote import history** ("imported {N} pages on {date}" or "started fresh on {date}").
+- Run the [`agentsmd` Step 3](#agentsmd--write-or-refresh-agentsmd) content-selection question, with **"Init recap" pre-checked** (its answers come from init — do not re-ask). The existing-file check and the confirm line work exactly as in `agentsmd` Step 2 / Step 5.
+
 
 ***
 
@@ -338,7 +352,128 @@ Empty parent directories left behind? Clean them up (e.g. if all sections of a n
 
 ***
 
+## `agentsmd` — Write or Refresh AGENTS.md
+
+Writes or refreshes `{notes_root}/AGENTS.md` — the workspace manifest recording how this notes workspace is managed, so **any future session, in any agent, starts with the same context**. Also run as init's final step (see [init Step 3](#step-3--done-write-agentsmd)).
+
+Fixed invariants — always present, not selectable: the manifest names the **note2md skill as the manager** of this workspace, and records **version control via git** if the notes root is (or should be) a git repository. The user chooses which optional blocks to include.
+
+### Step 1 — Resolve Notes Root
+
+If the session already resolved `{notes_root}` (e.g. delegated from init, or earlier in this conversation), reuse it. Otherwise ask:
+
+```
+Question: "Use the current directory '{cwd}' as your notes root?"
+Options:
+  - "Yes — use {cwd}/"
+  - "No — let me specify a path"
+```
+
+Do not scan or infer. If the chosen directory has no `.note2md/` yet, mention it once: "This directory doesn't look initialized — run `init` for the full setup," then continue (the manifest works standalone).
+
+**Resolve the manifest language** — the language the file is written in is a durable decision, determined once at init; it must not drift between runs. Resolve in this order:
+
+1. An existing `{notes_root}/AGENTS.md` has a **Language** field → use it.
+2. The session ran init → use the language chosen there.
+3. Neither → ask now: `Question: "Select your language / 选择语言：" Options: "中文" | "English"` — reuse init's Step 0 question.
+
+The resolved language governs Step 4's rendering and is recorded in the manifest's **Language** line.
+
+### Step 2 — Existing-File Check
+
+If `{notes_root}/AGENTS.md` exists, read it first:
+
+- Has the marker `<!-- Generated by note2md -->` → refreshable: continue (the new content replaces it).
+- No marker → **user-owned file: do not overwrite.** Tell the user, and offer to merge chosen blocks into it by appending — only with their explicit approval, marker added at the end. If they decline, stop here.
+
+### Step 3 — Choose Content
+
+Fixed blocks are always included (shown here so the user knows what they'll get):
+
+1. **Workspace** — notes root, Notebook → Section → Page hierarchy, `.note2md/` internal-area rules (archive not read unless asked).
+2. **note2md skill** — this workspace is managed by the note2md skill; command flows live there, not here.
+3. **Version control** — notes are versioned with git; never commit without asking; if the notes root is not a git repo yet, offer `git init` + baseline `.gitignore` (`.note2md/import/`, `.note2md/archive/`) as part of this command.
+
+Optional blocks — one multi-select question:
+
+```
+Question: "Which sections should AGENTS.md include?"
+Options (multi-select):
+  - "Init recap — language, import history" (pre-checked when delegated from init)
+  - "Template habits — preferred templates per notebook/section"
+  - "Sensitive-info policy — what securecheck should flag or skip"
+  - "Custom conventions — your own standing rules"
+  - "None — just the fixed blocks"
+```
+
+For each selected block, ask its question (free text, one ask each; skip = record "none recorded"):
+
+| Block | Question |
+|-------|----------|
+| Init recap | Not asked — filled from init's answers (language, OneNote import or fresh start). Standalone runs without an init session: ask "Was this library imported from OneNote, and when?" |
+| Template habits | "Any template habits? e.g. 'meeting notes always use the meeting template in Chinese'" |
+| Sensitive-info policy | "What should securecheck flag or skip? e.g. 'always flag project codes PRJ-XXXX', 'never scan the Finance notebook'" |
+| Custom conventions | "Any other standing conventions for agents working here?" |
+
+### Step 4 — Write
+
+- Content fully in the **resolved manifest language** (Step 1's language rule — init's original choice, never re-derived from the session). The only fixed strings are the two marker comments, which must stay literal so future runs recognize the file. The block below shows the English flavor; every line renders in the resolved language otherwise:
+
+  ````markdown
+  <!-- Generated by note2md (v{PLUGIN_VERSION}, {YYYY-MM-DD}) -->
+  # AGENTS.md — note2md workspace
+
+  Read this file before touching anything under this directory. It records how this
+  workspace is managed; command flows live in the note2md skill itself.
+
+  ## Workspace
+  - Notes root: {notes_root}
+  - Notebook → Section → Page: every notebook is a folder, every section a subfolder,
+    every page a `.md` file — no lock-in, everything is manageable through the file manager.
+  - `.note2md/` is the internal area (templates / archive / import) — never a notebook;
+    `archive/` is not read unless the user asks to search the archive.
+  - This workspace is managed by the **note2md skill** — use its commands and flows here.
+
+  ## Version control
+  - Notes are versioned with **git**; never commit without asking the user first.
+  - `{notes_root}` {is|is not} a git repository{; baseline .gitignore covers .note2md/import/ and .note2md/archive/.}
+
+  ## Init recap (standing orders for every session)          ← only if selected
+  - Language: {中文|English} — use it for confirmations and any generated content
+  - Imported from OneNote: {yes — {N} pages on {YYYY-MM-DD}; | no — started fresh on {YYYY-MM-DD}}
+
+  ## Template habits                                          ← only if selected
+  - {what the user described, or "none recorded — pick the closest shipped template, ask when unsure"}
+
+  ## Sensitive-info policy                                    ← only if selected
+  - {what securecheck should flag or skip, or "none recorded — use securecheck defaults"}
+
+  ## Custom conventions                                       ← only if selected
+  - {one bullet per free-text answer}
+
+  ## Conventions
+  - Default page naming: `daily` → `{date}.md`, `meeting` → `{date}-{topic}.md`,
+    `quick-note` → `{date}-{title}.md`, others → `{title}.md`; existing file → append `(2)`.
+  - Templates live in `.note2md/templates/` (`{name}.template.md`, user templates first),
+    shipped defaults (daily / meeting / quick-note) as fallback.
+
+  <!-- Generated by note2md; this marker block must stay so future runs can recognize it. -->
+  ````
+
+- Refreshing an existing generated file → replace wholesale. Merging into a user-owned file (only with explicit approval) → append the selected sections under a `<!-- note2md -->` comment header and add the marker at the end.
+- If "Version control" recorded *is not a git repository* and the user agreed to `git init`, run it now (create the baseline `.gitignore` if absent) and update the line before writing.
+
+### Step 5 — Confirm
+
+```
+Done: AGENTS.md written at {notes_root}/AGENTS.md ({N} sections). Every future session starts from this file.
+```
+
+***
+
 ## `securecheck` — Security Check
+
+> **AGENTS.md light check:** if `{notes_root}/AGENTS.md` does not exist, add one line to your final reply (in the user's language, once per session, regardless of which command ran): "Tip: your notes root has no AGENTS.md — run `agentsmd` to generate one (it records how this workspace is managed, for every future session)." Non-blocking; continue the command as usual.
 
 Scans `{notes_root}/` (excluding `.note2md/`) for sensitive information. Read files directly — you understand context, not just regex.
 
@@ -445,6 +580,16 @@ All templates — user and plugin defaults — use the `{name}.template.md` suff
 
 
 **Manual**: Drop `{name}.template.md` files into `{notes_root}/.note2md/templates/`. Auto-discovered by `newpage`.
+
+***
+
+## AGENTS.md — Workspace Manifest
+
+`{notes_root}/AGENTS.md` is the workspace manifest: a durable record of how this notes workspace is managed, so **any future session, in any agent, starts with the same context**. Written by the [`agentsmd` command](#agentsmd--write-or-refresh-agentsmd) (and automatically as init's final step). Command flows live in this SKILL.md and are **never** duplicated into AGENTS.md — the manifest holds only data and standing decisions, which every session reads as standing orders.
+
+* **Marker:** files with the `<!-- Generated by note2md -->` marker are owned by this flow and refreshed wholesale; without it, the file is user-owned — never overwritten. Merging into a user-owned file only happens with the user's explicit approval. Users can edit the file anytime — except for keeping the marker block, their edits win.
+* **Content scope:** fixed blocks (workspace rules, note2md-skill dependency, git version control) plus the optional blocks chosen at `agentsmd` Step 3 (init recap, template habits, sensitive-info policy, custom conventions). No command tables, no flows.
+* **Light check:** when a command session finds no `AGENTS.md` at `{notes_root}`, the agent adds a one-line tip to its final reply (once per session, non-blocking) suggesting `agentsmd`.
 
 ***
 
@@ -593,4 +738,3 @@ Default naming rules:
 |  (default)   | `{title}.md`        | `my-note.md`                   |
 
 > ⚠️ When editing this file, keep `SKILL-CN.md` (`../../SKILL-CN.md`) in sync. It is the Chinese reference version for the plugin author.
-

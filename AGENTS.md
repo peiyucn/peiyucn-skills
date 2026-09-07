@@ -11,7 +11,7 @@ peiyucn-skills/                          — 仓库根 = 市场
 ├── docs/
 │   └── agent-compatibility.md     — 三平台兼容性分析与决策记录（为什么用 .claude-plugin 统一兼容）
 ├── plugins/note2md/               — 市场下的插件（插件名保持 note2md，命令命名空间 /note2md:xxx）
-│   ├── commands/                  — 命令文件（8 个 .md，三平台通用：Claude Code / Codex / Copilot 均自动发现，命名空间 /note2md:xxx）
+│   ├── commands/                  — 命令文件（9 个 .md，三平台通用：Claude Code / Codex / Copilot 均自动发现，命名空间 /note2md:xxx）
 │   ├── .claude-plugin/
 │   │   └── plugin.json            — 插件清单（声明 commands；skills 目录自动发现）
 │   └── skills/note2md/
@@ -43,7 +43,7 @@ peiyucn-skills/                          — 仓库根 = 市场
 |------|------|
 | `.claude-plugin/marketplace.json` | 市场货架清单。`name` 即市场名（peiyucn-skills），插件条目声明 `source: ./plugins/note2md`；多余字段被各平台静默忽略 |
 | `docs/agent-compatibility.md` | 三平台兼容性分析与决策记录（市场/插件安装/命令注册机制） |
-| `plugins/note2md/skills/note2md/SKILL.md` | **核心**：所有 8 个命令的完整交互流程。是唯一需要维护逻辑的地方 |
+| `plugins/note2md/skills/note2md/SKILL.md` | **核心**：所有 9 个命令的完整交互流程。是唯一需要维护逻辑的地方 |
 | `plugins/obscura-web/skills/obscura-web/SKILL.md` | **核心**：抓取（fetch/scrape）/会话（MCP）/原生 CDP 三种姿势与已知坑；脚本路径 {SKILL_DIR} 相对约定 |
 | `plugins/obscura-web/SKILL-CN.md` | SKILL.md 中文同步翻译，仅供作者对照。**修改 SKILL.md 时必须同步更新** |
 | `plugins/note2md/SKILL-CN.md` | SKILL.md 的中文同步翻译，仅供作者对照。**修改 SKILL.md 时必须同步更新** |

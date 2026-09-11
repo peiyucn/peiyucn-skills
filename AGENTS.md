@@ -53,7 +53,7 @@ peiyucn-skills/                          — 仓库根 = 市场
 > 三份文档各司其职、各有读者：AGENTS 给开发 agent、README 给用户、CHANGELOG 给用户——写错读者是文档事故。
 
 * `AGENTS.md`：中文一份（面向开发 agent；唯一 agent 指令文件，不保留 CLAUDE.md 等其它厂商指令文件）
-* `README.md` / `README.zh-CN.md`：市场介绍——安装、命令列表、导入说明；中英双份、英文默认、顶部互链；功能/命令变更时更新
+* `README.md` / `README.zh-CN.md`：市场介绍——安装、命令列表、导入说明；中英双份、英文默认、顶部互链；功能/命令变更时更新。**面向用户**：只写用法与行为，不写实现细节、私有 seam、开发历史（归本文件与 `docs/`）
 * `CONTRIBUTING.md` / `CONTRIBUTING.zh-CN.md`：贡献指南——项目结构树、分支策略；结构或流程变更时更新
 * 无 CHANGELOG（版本语义 = `marketplace.json`/`plugin.json` 的 `version` 字段 + git tag，见「工程管线 · 发布」）
 * 插件内：`SKILL.md` 是**单一真相来源**；`SKILL-CN.md` 是其**中文同步翻译**（仅供作者对照，改 SKILL.md 必须同步）；`commands/*.md` 是薄壳委托，不重复维护逻辑
@@ -79,8 +79,7 @@ peiyucn-skills/                          — 仓库根 = 市场
 
 * 已开启（2026-09 逐项核验）：Dependabot alerts（仅报警）、secret scanning + push protection、根 `SECURITY.md`
 * 未开启（与统一安全基线有出入，2026-09 逐项核验）：CodeQL default setup（`state=not-configured`）、Dependabot 自动升级
-* 分支保护三层（2026-09 逐项核验）：① 经典保护 **未设**（与基线的出入：无「要求对话解决 / 不允许绕过」）② ruleset 轻保护 ✓（`dev` 与默认分支各一条：禁删/禁强推/禁建）③ 仓库合并设置 **非 Squash-only**（与基线的出入：`allow_merge_commit` / `allow_rebase_merge` / `allow_squash_merge` 三个全开）；无 CI
-* **核验别只跑 `.security_and_analysis`**（它只含 secret scanning 项）——逐项命令见根规范《统一安全基线 · 逐项检查命令》
+* 分支保护三层（2026-09 逐项核验）：① 经典保护 **未设**（与基线的出入：无「要求对话解决 / 不允许绕过」）② ruleset 轻保护 ✓（`dev` 与默认分支各一条）③ 合并设置 **非 Squash-only**（与基线的出入：三个合并方式全开）；无 CI；核验按根规范《统一安全基线 · 逐项检查命令》逐项跑（**别只跑 `.security_and_analysis`**）
 
 ## GitHub 与网络
 

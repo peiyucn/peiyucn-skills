@@ -64,7 +64,7 @@ $install = "{SKILL_DIR}/scripts/install-obscura.ps1"
 & $bin --proxy http://127.0.0.1:7897 fetch https://example.com --dump markdown --output "$env:TEMP\p.md"
 ```
 
-**Rule: always write with `--output` and read the file — never pipe-capture stdout** (encoding / escaping issues).
+**Rule: `fetch` always writes with `--output` (`-o`) and you read the file back — never pipe-capture its stdout** (encoding / escaping issues).
 
 Dump types: `markdown` / `text` / `html` (rendered DOM) / `links` / `assets` (subresource list, NDJSON) / `original` (raw response, binary-safe).
 
@@ -72,11 +72,23 @@ Dump types: `markdown` / `text` / `html` (rendered DOM) / `links` / `assets` (su
 
 ## Batch scraping
 
+`scrape` has **no `--output` flag** — it prints to stdout, so redirect it (plain `Out-File -Encoding utf8`; UTF-8 without BOM on PowerShell 7):
+
 ```powershell
-& $bin scrape url1 url2 url3 --concurrency 10 --eval "document.title" --format json --quiet --output "$env:TEMP\out.json"
+& $bin scrape url1 url2 url3 --concurrency 10 --eval "document.title" --format json --quiet |
+  Out-File -Encoding utf8 "$env:TEMP\out.json"
 ```
 
-`scrape` fans out to worker processes, so **`obscura-worker.exe` must sit next to `obscura.exe`** — the installer places both. Start at `--concurrency 5`–`10`: workers are separate processes, so memory rather than CPU is the practical ceiling. `--quiet` keeps progress off stderr for script-friendly output.
+It emits **one JSON object, not an array** — the rows live under `.results`:
+
+```json
+{ "total_urls": 3, "concurrency": 10, "total_time_ms": 1234, "avg_time_ms": 411.0,
+  "results": [ { "url": "…", "title": "…", "eval": "…", "time_ms": 411, "worker": 0 } ] }
+```
+
+`--format text` prints a plain-text variant instead. Flags: `-e/--eval`, `--concurrency` (default 10), `--format` (default `json`), `--timeout` (default 60), `-q/--quiet`, plus the global `--proxy` / `--stealth`.
+
+`scrape` fans out to worker processes, so **`obscura-worker.exe` must sit next to `obscura.exe`** — the installer places both. Start at `--concurrency 5`–`10`: workers are separate processes, so memory rather than CPU is the practical ceiling.
 
 ## Stealth
 
@@ -84,7 +96,8 @@ Stealth is a **build variant** plus a **runtime flag**. Reach for it when the ta
 
 ```powershell
 & $bin fetch https://example.com --dump markdown --stealth --output "$env:TEMP\p.md"
-& $bin scrape url1 url2 --stealth --concurrency 5 --format json --output "$env:TEMP\out.json"
+& $bin scrape url1 url2 --stealth --concurrency 5 --format json --quiet |
+  Out-File -Encoding utf8 "$env:TEMP\out.json"
 ```
 
 It adds per-session fingerprint randomization (GPU / screen / canvas / audio / battery), a realistic `navigator.userAgentData`, `navigator.webdriver = undefined`, native-function masking, `event.isTrusted = true`, and blocks 3,520 tracker domains. It requires the `stealth` build (`install-obscura.ps1 -Force -Variant stealth`); the runtime flag alone is not enough.

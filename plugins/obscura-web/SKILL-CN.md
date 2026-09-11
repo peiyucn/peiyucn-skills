@@ -60,7 +60,7 @@ $install = "{SKILL_DIR}/scripts/install-obscura.ps1"
 & $bin --proxy http://127.0.0.1:7897 fetch https://example.com --dump markdown --output "$env:TEMP\p.md"
 ```
 
-**铁律：一律 `--output` 落文件再读，不要管道捕获 stdout**（编码/转义问题）。
+**铁律：`fetch` 一律用 `--output`（`-o`）落文件再读，不要管道捕获它的 stdout**（编码/转义问题）。
 
 dump 类型：`markdown` / `text` / `html`（渲染后 DOM）/ `links` / `assets`（子资源清单 NDJSON）/ `original`（原始响应，二进制安全）。
 
@@ -68,11 +68,23 @@ dump 类型：`markdown` / `text` / `html`（渲染后 DOM）/ `links` / `assets
 
 ## 批量并发抓取
 
+`scrape` **没有 `--output`**——它打到 stdout，所以要重定向（`Out-File -Encoding utf8`；PowerShell 7 下即无 BOM 的 UTF-8）：
+
 ```powershell
-& $bin scrape url1 url2 url3 --concurrency 10 --eval "document.title" --format json --quiet --output "$env:TEMP\out.json"
+& $bin scrape url1 url2 url3 --concurrency 10 --eval "document.title" --format json --quiet |
+  Out-File -Encoding utf8 "$env:TEMP\out.json"
 ```
 
-`scrape` 会扇出到 worker 进程，所以 **`obscura-worker.exe` 必须与 `obscura.exe` 同目录**（安装脚本会把两个都放好）。从 `--concurrency 5`–`10` 起步：worker 是独立进程，实际瓶颈是内存而非 CPU。`--quiet` 让进度不落 stderr，便于脚本消费输出。
+它输出的是**一个 JSON 对象、不是数组**——行数据在 `.results` 下：
+
+```json
+{ "total_urls": 3, "concurrency": 10, "total_time_ms": 1234, "avg_time_ms": 411.0,
+  "results": [ { "url": "…", "title": "…", "eval": "…", "time_ms": 411, "worker": 0 } ] }
+```
+
+`--format text` 改为输出纯文本。参数：`-e/--eval`、`--concurrency`（默认 10）、`--format`（默认 `json`）、`--timeout`（默认 60）、`-q/--quiet`，外加全局的 `--proxy` / `--stealth`。
+
+`scrape` 会扇出到 worker 进程，所以 **`obscura-worker.exe` 必须与 `obscura.exe` 同目录**（安装脚本会把两个都放好）。从 `--concurrency 5`–`10` 起步：worker 是独立进程，实际瓶颈是内存而非 CPU。
 
 ## Stealth（反指纹）
 
@@ -80,7 +92,8 @@ Stealth 是**构建变体**加**运行时 flag**。目标站点会指纹识别�
 
 ```powershell
 & $bin fetch https://example.com --dump markdown --stealth --output "$env:TEMP\p.md"
-& $bin scrape url1 url2 --stealth --concurrency 5 --format json --output "$env:TEMP\out.json"
+& $bin scrape url1 url2 --stealth --concurrency 5 --format json --quiet |
+  Out-File -Encoding utf8 "$env:TEMP\out.json"
 ```
 
 它加的是：每会话指纹随机化（GPU / 屏幕 / canvas / 音频 / 电池）、真实的 `navigator.userAgentData`、`navigator.webdriver = undefined`、原生函数掩码、`event.isTrusted = true`，并拦截 3520 个追踪域名。需要 `stealth` 变体的二进制（`install-obscura.ps1 -Force -Variant stealth`）；只加运行时 flag 不够。

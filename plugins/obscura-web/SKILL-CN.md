@@ -9,7 +9,7 @@
 | 工具 | 定位 | 什么时候用 |
 |---|---|---|
 | Agent 内置 fetch（如 `web_fetch` + `web_search` 组合） | 轻量读取 | 静态页快速读、跟随搜索链接 |
-| `browser-cdp` skill（真 Chrome） | 复用登录态 | 需要已有 Chrome 登录会话的任务 |
+| 真 Chrome，手动驱动 | 复用登录态 | 需要已有 Chrome 登录会话的任务（很少见） |
 | **`obscura-web`（本插件）** | 匿名重型抓取 + 会话 | JS 重页面、批量抓取、截图/PDF、多步流程（可自建并保持登录会话） |
 
 > 路径约定：`{SKILL_DIR}` = 本 skill 目录（skill 运行器会解析；否则替换为 `skills/obscura-web` 的绝对路径）。
@@ -141,7 +141,7 @@ node $bmcp close                          # 关页面 = 清空会话
 
 - **端口冲突**：作者机器上 9222 被 `msedgewebview2` 调试端口占用——勿碰勿杀。本插件默认 9223；`failed`（10048）即端口被占，换 `-Port`。
 - **CDP 断开即重置页面**（实测 v0.2.2）：serve 页面在客户端断开后回到 `about:blank`——多步必须走 MCP。
-- **stealth 过不了验证码/IP 级风控**（实测：qidian.com 即便 stealth 也返回 HTTP 202 / 验证码页——拦截在 IP/会话层）。这类站点用真 Chrome 登录态（browser-cdp），别用本插件硬刚。
+- **stealth 过不了验证码/IP 级风控**（实测：qidian.com 即便 stealth 也返回 HTTP 202 / 验证码页——拦截在 IP/会话层）。这类站点自己起一个真 Chrome 登录态来做（或经 CDP 挂上去），别用本插件硬刚。
 - **SSRF 防护默认拦内网**：localhost / LAN / 内网需 `--allow-private-network`——`start`（CDP）与 `mcp-start`（MCP）**都要**用 `-Local` 透传，两者都支持。不带的话导航直接失败：`Network error: Access to private/internal IP address 127.0.0.1 is not allowed`。
 - **带鉴权的本机应用要用它自己打印的 URL**：对裸 origin（如 `http://127.0.0.1:3080`）发请求，遇到需要 token 的应用只会拿到鉴权壳——401 页、`#root` 为空、零数据请求、一直「加载中」。这看着极像「引擎渲染不了这个 SPA」，实际只是缺 token；用应用打印的带 token URL（DSH web GUI 上实踩过）。
 - **页面侧运行时报错在引擎日志里，不在 `browse-mcp.js console`**：那个助手可能回「No console messages」，而页面其实在抛错——引擎侧的 `obscura::console` 行（含未捕获的页面错误）落在 `~/.obscura/logs/mcp.err.log`（CDP 则是 `serve.err.log`）。页面渲染出来但行为不对时，**先读这份日志**，通常一条命令就能定位。

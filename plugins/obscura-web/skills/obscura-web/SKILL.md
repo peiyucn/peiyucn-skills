@@ -1,6 +1,6 @@
 ---
 name: obscura-web
-description: "Use this skill for web fetching, scraping and interactive browsing with the local Obscura engine (Rust headless browser, no Chromium). Covers: JS-rendered page fetching with clean Markdown output, parallel batch scraping, screenshots/PDF, and stateful multi-step sessions via its MCP server. Use it instead of the agent's built-in fetch tool when a page is JS-heavy or blocked, and for anonymous scraping; keep browser-cdp (real Chrome login reuse) for tasks that need an existing logged-in session. Trigger phrases: 抓取, 抓页面, 网页抓取, JS 渲染, 无头浏览器, obscura, headless browser, scraping, fetch page, SPA, 批量抓取, 截图, 会话浏览, 浏览器会话, markdown dump."
+description: "Use this skill for web fetching, scraping and interactive browsing with the local Obscura engine (Rust headless browser, no Chromium). Covers: JS-rendered page fetching with clean Markdown output, parallel batch scraping, screenshots/PDF, and stateful multi-step sessions via its MCP server. Use it instead of the agent's built-in fetch tool when a page is JS-heavy or blocked, and for anonymous scraping; a task that needs an existing logged-in Chrome session is rare — for those drive a real Chrome, not this skill. Trigger phrases: 抓取, 抓页面, 网页抓取, JS 渲染, 无头浏览器, obscura, headless browser, scraping, fetch page, SPA, 批量抓取, 截图, 会话浏览, 浏览器会话, markdown dump."
 metadata: {"source": "https://github.com/h4ckf0r0day/obscura", "requires": {"files": ["~/.obscura/bin/obscura.exe"]}}
 ---
 
@@ -13,7 +13,7 @@ Use the local **Obscura** engine (Rust headless browser, embedded V8, no Chromiu
 | Tool | Role | Use it when |
 |---|---|---|
 | Agent built-in fetch (e.g. `web_fetch` + `web_search` pair) | Lightweight reads | Quick static pages, following search links |
-| `browser-cdp` skill (real Chrome) | Login-state reuse | Tasks that need an existing logged-in Chrome session |
+| Real Chrome, driven manually | Login-state reuse | The rare task that needs an existing logged-in Chrome session |
 | **`obscura-web` (this plugin)** | Anonymous heavy fetching + sessions | JS-heavy pages, batch scraping, screenshots/PDF, multi-step flows (can build and hold its own login session) |
 
 > Path convention: `{SKILL_DIR}` = this skill's directory (the skill runner resolves it; otherwise substitute the absolute path of `skills/obscura-web`).
@@ -145,7 +145,7 @@ For one-off Puppeteer scripts or Obscura-private domains like `LP.getMarkdown`:
 
 - **Port conflict**: on the author's machine 9222 is held by `msedgewebview2` debugging — never touch/kill it. This plugin defaults to 9223; `failed` (10048) means port busy, use `-Port`.
 - **CDP detach resets the page** (verified v0.2.2): serve pages drop to `about:blank` when the client disconnects — multi-step must go through MCP.
-- **stealth does not defeat captcha/IP-level anti-bot** (verified: qidian.com answers HTTP 202 / a verification page even with stealth — the block is IP/session-level). For those sites use a real logged-in Chrome (browser-cdp), not this plugin.
+- **stealth does not defeat captcha/IP-level anti-bot** (verified: qidian.com answers HTTP 202 / a verification page even with stealth — the block is IP/session-level). For those sites drive a real logged-in Chrome (start it yourself, or attach over CDP), not this plugin.
 - **SSRF guard blocks private networks by default**: localhost / LAN / intranet needs `--allow-private-network` — pass `-Local` to **either** `start` (CDP) **or** `mcp-start` (MCP); both forward it. Without it, navigation to `127.0.0.1` fails outright: `Network error: Access to private/internal IP address 127.0.0.1 is not allowed`.
 - **Auth-gated local apps need the URL the app itself prints**: hitting a bare origin (say `http://127.0.0.1:3080`) on an app that requires a token returns an auth shell — 401 page, empty `#root`, zero data requests, "loading…" forever. That looks exactly like "the engine can't render this SPA", but it is a missing token; use the tokenized URL the app printed (seen on the DSH web GUI).
 - **Page-side runtime errors land in the engine log, not in `browse-mcp.js console`**: that helper can answer "No console messages" while the page is in fact throwing — engine-side `obscura::console` lines (uncaught page errors included) go to `~/.obscura/logs/mcp.err.log` (CDP: `serve.err.log`). When a page renders but behaves wrong, read that log **first**; it is usually a one-command answer.

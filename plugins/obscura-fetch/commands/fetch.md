@@ -4,4 +4,4 @@ description: Fetch a URL through the local Obscura engine and return rendered co
 argument-hint: <url> [--dump markdown|text|html|links|original]
 ---
 
-Execute the fetch flow from the obscura-web skill.
+Execute the fetch flow from the obscura-fetch skill.

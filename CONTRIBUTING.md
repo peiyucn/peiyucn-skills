@@ -26,11 +26,11 @@ peiyucn-skills/                              # Repo root = marketplace
 │           ├── export-onenote.ps1     # OneNote COM export (Windows; optional)
 │           ├── convert-onenote-md.ps1 # XML → Markdown conversion (core)
 │           └── format-onenote-xml.ps1 # XML pretty-printing (optional; before import)
-├── plugins/obscura-web/               # Plugin: anonymous web scraping (Obscura engine)
+├── plugins/obscura-fetch/               # Plugin: anonymous web scraping (Obscura engine)
 │   ├── .claude-plugin/plugin.json     # Plugin metadata
 │   ├── commands/                      # Slash-command stubs (thin shells)
 │   ├── SKILL-CN.md                    # Chinese reference for the author (not loaded by agents)
-│   └── skills/obscura-web/
+│   └── skills/obscura-fetch/
 │       ├── SKILL.md                   # Agent behavior — fetch / batch scrape only
 │       └── scripts/
 │           └── install-obscura.ps1    # Engine install/upgrade (Windows)

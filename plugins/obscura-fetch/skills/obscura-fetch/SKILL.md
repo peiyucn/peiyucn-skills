@@ -4,7 +4,7 @@ description: "Use this skill for anonymous web scraping and batch crawling with 
 metadata: {"source": "https://github.com/h4ckf0r0day/obscura", "requires": {"files": ["~/.obscura/bin/obscura.exe"]}}
 ---
 
-# Obscura Web — Anonymous Scraping Engine
+# Obscura Fetch — Anonymous Scraping Engine
 
 Use the local **Obscura** engine (Rust headless browser, embedded V8, no Chromium) for **anonymous scraping**: one-shot page fetch, parallel batch crawling, raw response download.
 

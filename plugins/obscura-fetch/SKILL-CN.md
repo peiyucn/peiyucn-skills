@@ -1,4 +1,4 @@
-# Obscura Web — 匿名抓取引擎（中文对照）
+# Obscura Fetch — 匿名抓取引擎（中文对照）
 
 > 本文件是 `skills/obscura-fetch/SKILL.md` 的中文同步翻译，仅供作者对照。以英文 SKILL.md 为准。
 

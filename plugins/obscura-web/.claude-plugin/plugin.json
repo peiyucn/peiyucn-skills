@@ -1,6 +1,6 @@
 {
   "name": "obscura-web",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Anonymous web scraping and batch crawling powered by the local Obscura engine (Rust headless browser, no Chromium). JS-rendered pages as clean Markdown, parallel batch scraping, stealth anti-fingerprinting, and binary-safe raw response download.",
   "commands": "./commands",
   "author": {

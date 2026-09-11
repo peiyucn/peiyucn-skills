@@ -65,7 +65,7 @@ peiyucn-skills/                          — 仓库根 = 市场
 * **验证**：无构建验证——提交前自查「commit 前检查工程文件」清单
 * **提交**：逐项提交，中文描述 + 英文类型前缀；可用类型 `feat` `fix` `refactor` `chore` `docs` `style` `perf` `build` `revert`（例：`feat: 新增命令自动补全`、`fix: 修复模板排序`、`docs: 补充命令交互流程文档`）；不确定的事直接说"不确定"，禁止编造事实性信息。**提交时机**：每轮对话结束时自行判断——独立完成一个功能/修复/重构且改动原子可回溯，或用户明确说「好了」「提交吧」→ 提交；还在讨论/探索、方向未定、中途打断、留了 TODO 未处理 → 先不交
 * **推送**：push 到 `dev` 后**必须**同步 `main`（`git push origin dev:main`）——Copilot Chat 市场安装拉的是 `main`，不同步会导致用户安装到旧版本；**版本号与 push 强绑定**：凡是 push，被改插件的 `plugin.json` 与 `marketplace.json` 对应条目的 `version` 必须同步更新——市场按版本号识别更新，只改代码不改版本号会导致用户装到旧版缓存；例外：未 push 的本地测试可先不改版本号，准备发布时才 bump + push
-* **发布确认（硬门禁，owner 当次点头）**：`git tag` / `npm publish` / 市场发布 / 部署上线等**不可逆的对外发布动作**，执行前必须由 owner **当次明确确认**——「之前批准了整条发布流程」「评审时说按你建议走」「继续」一律**不构成**发布许可；agent 做完审计 / 定版 / verify / 合并后**停在发布动作之前**，一句话报出「要发什么、版本号、目标通道、影响范围」等 owner 回话，未回话即视为未批准（总规范《工程管线 · ⑦发布》第 5 步）
+* **发布确认（硬门禁，owner 当次点头）**：`git tag` / `npm publish` / 市场发布 / 部署上线等**不可逆的对外发布动作**，执行前必须由 owner **当次明确确认**——「之前批准了整条发布流程」「评审时说按你建议走」「继续」一律**不构成**发布许可；agent 做完审计 / 定版 / verify / 合并后**停在发布动作之前**，一句话报出「要发什么、版本号、目标通道、影响范围」等 owner 回话，未回话即视为未批准（总规范《发布（定版）》第 5 步）
 * **发布**：**两插件各自独立版本线**（松散集合，互不牵连：note2md 与 obscura-scrape 的版本号各自独立演进，当前值见 `marketplace.json`）；每个 push 的版本**必须**打 tag（`git tag -a {plugin}-v{version} -m "{plugin}-v{version}: {简要说明}"` + `git push origin {plugin}-v{version}`；新 tag 一律插件前缀；历史无前缀 v0.1.0–v0.5.1 是 note2md 单插件时期的遗留，保留不动）；版本规则：`fix` → patch（0.5.3 → 0.5.4）、`feat` → minor（0.5.3 → 0.6.0）、破坏性变更 → major；流程：bump 被改插件的 `plugin.json` + `marketplace.json` 对应条目 → commit → push dev → push dev:main → 打 tag → push tag，**一个版本一个 commit，版本号与代码同批推送**
 * **commit 前检查工程文件**：任何涉及行为/结构的改动，commit 前必须检查以下文件是否需要同步调整：
   * `AGENTS.md` — 项目结构树、关键文件表、命令数量（**结构改动必查**；曾因漏掉本文件，结构树长期写着已删除的目录）
@@ -79,7 +79,7 @@ peiyucn-skills/                          — 仓库根 = 市场
 
 * 已开启（2026-09 逐项核验）：Dependabot alerts（仅报警）、secret scanning + push protection、根 `SECURITY.md`
 * 未开启（与统一安全基线有出入，2026-09 逐项核验）：CodeQL default setup（`state=not-configured`）、Dependabot 自动升级
-* 分支保护三层（2026-09 逐项核验）：① 经典保护 **未设**（与基线的出入：无「要求对话解决 / 不允许绕过」）② ruleset 轻保护 ✓（`dev` 与默认分支各一条）③ 合并设置 **非 Squash-only**（与基线的出入：三个合并方式全开）；无 CI；核验按根规范《统一安全基线 · 逐项检查命令》逐项跑
+* 分支保护三层（2026-09 逐项核验）：经典保护 **未设**（与基线的出入：无「要求对话解决 / 不允许绕过」）；ruleset 轻保护 ✓（`dev` 与默认分支各一条）；合并设置 **非 Squash-only**（与基线的出入：三个合并方式全开）；无 CI；核验按根规范《统一安全基线 · 逐项检查命令》逐项跑
 
 ## GitHub 与网络
 

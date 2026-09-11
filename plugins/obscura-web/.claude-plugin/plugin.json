@@ -1,6 +1,6 @@
 {
   "name": "obscura-web",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Web fetching, scraping, and stateful browser sessions powered by the local Obscura engine (Rust headless browser, no Chromium). JS-rendered pages as clean Markdown, parallel batch scraping, screenshots/PDF, and multi-step sessions via the built-in MCP server.",
   "commands": "./commands",
   "author": {

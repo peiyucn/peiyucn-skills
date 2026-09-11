@@ -49,6 +49,7 @@ $svc = "{SKILL_DIR}/scripts/obscura-serve.ps1"
 
 # MCP service — the resident workhorse for stateful sessions (page survives between tool calls)
 & $svc -Action mcp-start            # http://127.0.0.1:8080/mcp
+& $svc -Action mcp-start -Local     # + reach localhost/LAN targets (required for local dev servers / local GUIs)
 & $svc -Action mcp-start -Stealth   # anti-fingerprint + tracker blocking
 & $svc -Action mcp-status
 & $svc -Action mcp-stop
@@ -145,7 +146,9 @@ For one-off Puppeteer scripts or Obscura-private domains like `LP.getMarkdown`:
 - **Port conflict**: on the author's machine 9222 is held by `msedgewebview2` debugging — never touch/kill it. This plugin defaults to 9223; `failed` (10048) means port busy, use `-Port`.
 - **CDP detach resets the page** (verified v0.2.2): serve pages drop to `about:blank` when the client disconnects — multi-step must go through MCP.
 - **stealth does not defeat captcha/IP-level anti-bot** (verified: qidian.com answers HTTP 202 / a verification page even with stealth — the block is IP/session-level). For those sites use a real logged-in Chrome (browser-cdp), not this plugin.
-- **SSRF guard blocks private networks by default**: localhost / LAN / intranet needs `--allow-private-network` (serve: `-Local`).
+- **SSRF guard blocks private networks by default**: localhost / LAN / intranet needs `--allow-private-network` — pass `-Local` to **either** `start` (CDP) **or** `mcp-start` (MCP); both forward it. Without it, navigation to `127.0.0.1` fails outright: `Network error: Access to private/internal IP address 127.0.0.1 is not allowed`.
+- **Auth-gated local apps need the URL the app itself prints**: hitting a bare origin (say `http://127.0.0.1:3080`) on an app that requires a token returns an auth shell — 401 page, empty `#root`, zero data requests, "loading…" forever. That looks exactly like "the engine can't render this SPA", but it is a missing token; use the tokenized URL the app printed (seen on the DSH web GUI).
+- **Page-side runtime errors land in the engine log, not in `browse-mcp.js console`**: that helper can answer "No console messages" while the page is in fact throwing — engine-side `obscura::console` lines (uncaught page errors included) go to `~/.obscura/logs/mcp.err.log` (CDP: `serve.err.log`). When a page renders but behaves wrong, read that log **first**; it is usually a one-command answer.
 - **Large bodies**: responses over 2 MiB aren't retained by default (`OBSCURA_NETWORK_BODY_BUFFER_BYTES`); stream big downloads over CDP `Fetch.takeResponseBodyAsStream` + `IO.read`.
 - **JS-heavy pages OOM**: `--v8-flags "--max-old-space-size=4096"`; SPA startup budget `OBSCURA_SCRIPT_DEADLINE_MS` (default 30000, try 60000 for heavy SPAs).
 - **Rendering fidelity**: independent engine — long-tail CSS / media playback / platform fonts differ from Chromium. Screenshots as reference, not pixel-exact.

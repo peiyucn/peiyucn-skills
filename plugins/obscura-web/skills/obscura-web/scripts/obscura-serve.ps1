@@ -7,7 +7,7 @@ obscura serve 常驻服务管理（CDP WebSocket 服务，Puppeteer/Playwright �
   .\obscura-serve.ps1 -Action start [-Port 9223] [-Workers 1] [-Local] [-Stealth]
   .\obscura-serve.ps1 -Action status
   .\obscura-serve.ps1 -Action stop
-  .\obscura-serve.ps1 -Action mcp-start [-McpPort 8080] [-Stealth]   # 有状态 MCP 服务（会话保持，agent 首选）
+  .\obscura-serve.ps1 -Action mcp-start [-McpPort 8080] [-Local] [-Stealth]   # 有状态 MCP 服务（会话保持，agent 首选）
   .\obscura-serve.ps1 -Action mcp-status
   .\obscura-serve.ps1 -Action mcp-stop
 
@@ -19,7 +19,9 @@ obscura serve 常驻服务管理（CDP WebSocket 服务，Puppeteer/Playwright �
   start  后台启动（Start-Process 脱离当前 shell），PID 写入 ~/.obscura/run/obscura-serve.pid
   status 检查 PID 存活 + /json/version HTTP 探测
   stop   只杀 PID 文件记录的 obscura 进程（核验进程名，绝不批量按名杀）
-  -Local  加 --allow-private-network（默认 SSRF 拦截内网，访问 localhost/LAN 才用）
+  -Local  加 --allow-private-network（默认 SSRF 拦截内网；访问 localhost/LAN 才用）。
+          对外层 start（CDP）与 mcp-start（MCP）都生效——跑本机开发服务器/本机 GUI
+          必须带上，否则导航直接被拒。
   -Stealth 反指纹 + 追踪域名拦截
 
 输出格式: SERVE_STATUS=<ready|running|degraded|starting|stopped|already-stopped> ...
@@ -83,11 +85,11 @@ switch ($Action) {
         if (-not (Test-Path $exe)) { throw "未安装 obscura（$exe 不存在），先跑 install-obscura.ps1" }
 
         New-Item -ItemType Directory -Force -Path $runDir, $logDir | Out-Null
-        $args = @('serve', '--port', "$Port", '--workers', "$Workers")
-        if ($Local) { $args += '--allow-private-network' }
-        if ($Stealth) { $args += '--stealth' }
+        $serveArgs = @('serve', '--port', "$Port", '--workers', "$Workers")
+        if ($Local) { $serveArgs += '--allow-private-network' }
+        if ($Stealth) { $serveArgs += '--stealth' }
 
-        $p = Start-Process -FilePath $exe -ArgumentList $args -WindowStyle Hidden `
+        $p = Start-Process -FilePath $exe -ArgumentList $serveArgs -WindowStyle Hidden `
             -RedirectStandardOutput (Join-Path $logDir 'serve.out.log') `
             -RedirectStandardError (Join-Path $logDir 'serve.err.log') -PassThru
         Set-Content -Path $pidFile -Value $p.Id
@@ -128,6 +130,10 @@ switch ($Action) {
         if (-not (Test-Path $exe)) { throw "未安装 obscura（$exe 不存在），先跑 install-obscura.ps1" }
         New-Item -ItemType Directory -Force -Path $runDir, $logDir | Out-Null
         $margs = @('mcp', '--http', '--port', "$McpPort")
+        # --allow-private-network 是 obscura 的全局 flag，mcp 子命令同样支持（obscura mcp --help 可见）。
+        # 漏传会让 MCP 会话里的页面根本够不到 localhost/LAN —— 导航即以
+        # "Access to private/internal IP address ... is not allowed" 失败。
+        if ($Local) { $margs += '--allow-private-network' }
         if ($Stealth) { $margs += '--stealth' }
         $mp = Start-Process -FilePath $exe -ArgumentList $margs -WindowStyle Hidden `
             -RedirectStandardOutput (Join-Path $logDir 'mcp.out.log') `

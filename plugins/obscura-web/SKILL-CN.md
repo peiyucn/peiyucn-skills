@@ -45,6 +45,7 @@ $svc = "{SKILL_DIR}/scripts/obscura-serve.ps1"
 
 # MCP 服务——常驻主角，会话模式用（工具调用之间页面保持存活）
 & $svc -Action mcp-start            # http://127.0.0.1:8080/mcp
+& $svc -Action mcp-start -Local     # 额外允许 localhost/LAN 目标（本机开发服务器 / 本机 GUI 必须带）
 & $svc -Action mcp-start -Stealth   # 反指纹 + 追踪域名拦截
 & $svc -Action mcp-status
 & $svc -Action mcp-stop
@@ -141,7 +142,9 @@ node $bmcp close                          # 关页面 = 清空会话
 - **端口冲突**：作者机器上 9222 被 `msedgewebview2` 调试端口占用——勿碰勿杀。本插件默认 9223；`failed`（10048）即端口被占，换 `-Port`。
 - **CDP 断开即重置页面**（实测 v0.2.2）：serve 页面在客户端断开后回到 `about:blank`——多步必须走 MCP。
 - **stealth 过不了验证码/IP 级风控**（实测：qidian.com 即便 stealth 也返回 HTTP 202 / 验证码页——拦截在 IP/会话层）。这类站点用真 Chrome 登录态（browser-cdp），别用本插件硬刚。
-- **SSRF 防护默认拦内网**：localhost / LAN / 内网需 `--allow-private-network`（serve 用 `-Local`）。
+- **SSRF 防护默认拦内网**：localhost / LAN / 内网需 `--allow-private-network`——`start`（CDP）与 `mcp-start`（MCP）**都要**用 `-Local` 透传，两者都支持。不带的话导航直接失败：`Network error: Access to private/internal IP address 127.0.0.1 is not allowed`。
+- **带鉴权的本机应用要用它自己打印的 URL**：对裸 origin（如 `http://127.0.0.1:3080`）发请求，遇到需要 token 的应用只会拿到鉴权壳——401 页、`#root` 为空、零数据请求、一直「加载中」。这看着极像「引擎渲染不了这个 SPA」，实际只是缺 token；用应用打印的带 token URL（DSH web GUI 上实踩过）。
+- **页面侧运行时报错在引擎日志里，不在 `browse-mcp.js console`**：那个助手可能回「No console messages」，而页面其实在抛错——引擎侧的 `obscura::console` 行（含未捕获的页面错误）落在 `~/.obscura/logs/mcp.err.log`（CDP 则是 `serve.err.log`）。页面渲染出来但行为不对时，**先读这份日志**，通常一条命令就能定位。
 - **大响应体**：默认 2 MiB 以上不保留（`OBSCURA_NETWORK_BODY_BUFFER_BYTES`）；大下载流式走 CDP `Fetch.takeResponseBodyAsStream` + `IO.read`。
 - **JS 重页面 OOM**：`--v8-flags "--max-old-space-size=4096"`；SPA 启动预算 `OBSCURA_SCRIPT_DEADLINE_MS`（默认 30000，重 SPA 试 60000）。
 - **渲染保真度**：独立引擎——长尾 CSS / 媒体播放 / 平台字体与 Chromium 有差异。截图做参考，别做像素级对比。

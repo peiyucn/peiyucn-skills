@@ -1,7 +1,7 @@
 {
   "name": "obscura-web",
-  "version": "0.1.4",
-  "description": "Web fetching, scraping, and stateful browser sessions powered by the local Obscura engine (Rust headless browser, no Chromium). JS-rendered pages as clean Markdown, parallel batch scraping, screenshots/PDF, and multi-step sessions via the built-in MCP server.",
+  "version": "0.1.5",
+  "description": "Anonymous web scraping and batch crawling powered by the local Obscura engine (Rust headless browser, no Chromium). JS-rendered pages as clean Markdown, parallel batch scraping, stealth anti-fingerprinting, and binary-safe raw response download.",
   "commands": "./commands",
   "author": {
     "name": "peiyucn"
@@ -9,5 +9,5 @@
   "homepage": "https://github.com/peiyucn/peiyucn-skills",
   "repository": "https://github.com/peiyucn/peiyucn-skills",
   "license": "MIT",
-  "keywords": ["web-scraping", "headless-browser", "browser-automation", "markdown", "mcp", "rust"]
+  "keywords": ["web-scraping", "crawler", "headless-browser", "stealth", "markdown", "rust"]
 }

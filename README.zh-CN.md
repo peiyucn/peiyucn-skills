@@ -83,11 +83,11 @@ Markdown 笔记，按笔记本→分区→页面三层结构组织，通过斜�
 
 ### obscura-web 🌐
 
-基于本地 **Obscura** 引擎（Rust 无头浏览器，内嵌 V8，无 Chromium）的网页抓取与浏览器会话。JS 渲染页面直接输出干净 Markdown，批量抓取并行执行，多步流程（登录→翻页→提取）通过内置 MCP 服务保持会话状态。
+基于本地 **Obscura** 引擎（Rust 无头浏览器，内嵌 V8，无 Chromium）的网页抓取与批量爬取。JS 渲染页面直接输出干净 Markdown，批量抓取并行执行，stealth 模式可过普通指纹识别，原始响应可二进制安全下载。**刻意只做抓取**：一切交互（点击、会话、登录态、截图、验收自家 UI）请改用 Playwright 栈。
 
-> 平台说明：Windows 优先。安装/服务管理脚本为 Windows PowerShell；macOS/Linux 从 [Obscura releases](https://github.com/h4ckf0r0day/obscura/releases) 安装官方二进制后直接运行 `obscura fetch` / `obscura mcp`。
+> 平台说明：Windows 优先。安装脚本为 Windows PowerShell；macOS/Linux 从 [Obscura releases](https://github.com/h4ckf0r0day/obscura/releases) 安装官方二进制后直接运行 `obscura fetch` / `obscura scrape`。
 
-> **装完插件后先跑一次 `/obscura-web install`。** 插件本体只含指令与脚本——Obscura 引擎二进制（约 160MB）会下载到 `~/.obscura/bin/`，所有 agent 共用一份，且不随插件更新被清理。随时重跑该命令（或 `-Force`）升级。
+> **装完插件后先跑一次 `/obscura-web install`。** 插件本体只含指令与一个安装脚本——Obscura 引擎二进制（约 160MB）会下载到 `~/.obscura/bin/`，所有 agent 共用一份，且不随插件更新被清理。随时重跑该命令（或 `-Force`）升级。
 
 #### 命令
 
@@ -96,7 +96,6 @@ Markdown 笔记，按笔记本→分区→页面三层结构组织，通过斜�
 | `/obscura-web help` | 快速入门指南 |
 | `/obscura-web install` | 安装/升级 Obscura 引擎二进制 |
 | `/obscura-web fetch <url>` | 抓取页面并输出渲染后 Markdown（含 JS 重页面） |
-| `/obscura-web browse <命令>` | 会话模式：导航、快照、点击、填表、提取 |
 
 ## License
 

@@ -73,11 +73,11 @@ Every `/note2md init` ends by writing an `AGENTS.md` at your notes root — a ma
 
 ### obscura-web 🌐
 
-Web fetching, scraping, and stateful browser sessions on the local **Obscura** engine — a Rust headless browser (embedded V8, no Chromium). JS-rendered pages come back as clean Markdown, batch scraping runs in parallel, and multi-step flows (login → paginate → extract) keep state through the built-in MCP server.
+Web scraping and batch crawling on the local **Obscura** engine — a Rust headless browser (embedded V8, no Chromium). JS-rendered pages come back as clean Markdown, batch scraping runs in parallel, stealth mode defeats ordinary fingerprinting, and raw responses can be downloaded binary-safe. Scrape-only by design: for anything interactive (clicking, sessions, login state, screenshots, verifying your own UI) use a Playwright-based stack instead.
 
-> **Platform note:** Windows-first. The PowerShell install/service helpers are Windows-only; on macOS/Linux install the official binary from the [Obscura releases](https://github.com/h4ckf0r0day/obscura/releases) and run `obscura fetch` / `obscura mcp` directly.
+> **Platform note:** Windows-first. The PowerShell install helper is Windows-only; on macOS/Linux install the official binary from the [Obscura releases](https://github.com/h4ckf0r0day/obscura/releases) and run `obscura fetch` / `obscura scrape` directly.
 
-> **After installing the plugin, run `/obscura-web install` once.** The plugin ships instructions and scripts only — the Obscura engine binary (~160 MB) is downloaded to `~/.obscura/bin/`, shared by all your agents, and survives plugin updates. Upgrade any time by re-running the command (or `-Force`).
+> **After installing the plugin, run `/obscura-web install` once.** The plugin ships instructions and one installer script — the Obscura engine binary (~160 MB) is downloaded to `~/.obscura/bin/`, shared by all your agents, and survives plugin updates. Upgrade any time by re-running the command (or `-Force`).
 
 #### Commands
 
@@ -86,7 +86,6 @@ Web fetching, scraping, and stateful browser sessions on the local **Obscura** e
 | `/obscura-web help` | Quick-start guide |
 | `/obscura-web install` | Install/upgrade the Obscura engine binary |
 | `/obscura-web fetch <url>` | Fetch a page as rendered Markdown (JS-heavy pages included) |
-| `/obscura-web browse <cmd>` | Stateful session: navigate, snapshot, click, fill, extract |
 
 ## License
 

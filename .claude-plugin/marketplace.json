@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "peiyucn-skills",
-  "description": "Agent-native skills marketplace. Ships note2md — Markdown note management with Notebook→Section→Page hierarchy, slash commands, OneNote import, and smart templates — and obscura-web, web fetching and browser automation on the local Obscura engine. Works across Copilot, Claude Code, and Codex.",
+  "description": "Agent-native skills marketplace. Ships note2md — Markdown note management with Notebook→Section→Page hierarchy, slash commands, OneNote import, and smart templates — and obscura-web, anonymous web scraping and batch crawling on the local Obscura engine. Works across Copilot, Claude Code, and Codex.",
   "owner": {
     "name": "peiyucn"
   },
@@ -18,11 +18,11 @@
     },
     {
       "name": "obscura-web",
-      "version": "0.1.4",
-      "description": "Web fetching, scraping, and stateful browser sessions on the local Obscura engine (Rust headless browser, no Chromium). JS-rendered pages as clean Markdown, parallel batch scraping, screenshots/PDF, and multi-step sessions via its MCP server. Windows-first; macOS/Linux install the official binary.",
+      "version": "0.1.5",
+      "description": "Anonymous web scraping and batch crawling on the local Obscura engine (Rust headless browser, no Chromium). JS-rendered pages as clean Markdown, parallel batch scraping, stealth anti-fingerprinting. Scrape-only: for interactive browsing use a Playwright-based stack. Windows-first; macOS/Linux install the official binary.",
       "source": "./plugins/obscura-web",
       "category": "developer-tools",
-      "tags": ["web-scraping", "headless-browser", "browser-automation", "markdown", "mcp", "rust"]
+      "tags": ["web-scraping", "crawler", "headless-browser", "stealth", "markdown", "rust"]
     }
   ]
 }

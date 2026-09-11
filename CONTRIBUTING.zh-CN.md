@@ -30,16 +30,14 @@ peiyucn-skills/                              # 仓库根 = 市场
 │           ├── export-onenote.ps1     # OneNote COM 导出（Windows；可选）
 │           ├── convert-onenote-md.ps1 # XML → Markdown 转换（核心）
 │           └── format-onenote-xml.ps1 # XML 排版（可选；导入前使用）
-├── plugins/obscura-web/               # 插件：网页抓取与浏览器自动化（Obscura 引擎）
+├── plugins/obscura-web/               # 插件：匿名网页抓取（Obscura 引擎）
 │   ├── .claude-plugin/plugin.json     # 插件元信息
 │   ├── commands/                      # 斜杠命令薄壳
 │   ├── SKILL-CN.md                    # 作者中文参考（不被 Agent 加载）
 │   └── skills/obscura-web/
-│       ├── SKILL.md                   # Agent 行为 — 抓取/批量/会话逻辑
+│       ├── SKILL.md                   # Agent 行为 — 只做抓取与批量爬取
 │       └── scripts/
-│           ├── install-obscura.ps1    # 引擎安装/升级（Windows）
-│           ├── obscura-serve.ps1      # MCP 与 CDP 服务管理（Windows）
-│           └── browse/                # Node 助手（puppeteer-core / MCP 客户端）
+│           └── install-obscura.ps1    # 引擎安装/升级（Windows）
 
 > `notes/` 和 `.note2md/` 属于用户空间 — 不在此仓库中。
 > `test/` 是手工测试用的临时目录 — 已被 git 忽略。

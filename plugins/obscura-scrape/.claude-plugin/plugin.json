@@ -1,6 +1,6 @@
 {
-  "name": "obscura-fetch",
-  "version": "0.3.0",
+  "name": "obscura-scrape",
+  "version": "0.4.0",
   "description": "Anonymous web scraping and batch crawling powered by the local Obscura engine (Rust headless browser, no Chromium). JS-rendered pages as clean Markdown, parallel batch scraping, stealth anti-fingerprinting, and binary-safe raw response download.",
   "commands": "./commands",
   "author": {

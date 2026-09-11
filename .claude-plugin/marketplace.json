@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "peiyucn-skills",
-  "description": "Agent-native skills marketplace. Ships note2md — Markdown note management with Notebook→Section→Page hierarchy, slash commands, OneNote import, and smart templates — and obscura-fetch, anonymous web scraping and batch crawling on the local Obscura engine. Works across Copilot, Claude Code, and Codex.",
+  "description": "Agent-native skills marketplace. Ships note2md — Markdown note management with Notebook→Section→Page hierarchy, slash commands, OneNote import, and smart templates — and obscura-scrape, anonymous web scraping and batch crawling on the local Obscura engine. Works across Copilot, Claude Code, and Codex.",
   "owner": {
     "name": "peiyucn"
   },
@@ -17,10 +17,10 @@
       "tags": ["notes", "markdown", "onenote", "migration", "knowledge-management", "productivity"]
     },
     {
-      "name": "obscura-fetch",
-      "version": "0.3.0",
+      "name": "obscura-scrape",
+      "version": "0.4.0",
       "description": "Anonymous web scraping and batch crawling on the local Obscura engine (Rust headless browser, no Chromium). JS-rendered pages as clean Markdown, parallel batch scraping, stealth anti-fingerprinting. Scrape-only: for interactive browsing use a Playwright-based stack. Windows-first; macOS/Linux install the official binary.",
-      "source": "./plugins/obscura-fetch",
+      "source": "./plugins/obscura-scrape",
       "category": "developer-tools",
       "tags": ["web-scraping", "crawler", "headless-browser", "stealth", "markdown", "rust"]
     }

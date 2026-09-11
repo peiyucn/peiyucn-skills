@@ -30,11 +30,11 @@ peiyucn-skills/                              # 仓库根 = 市场
 │           ├── export-onenote.ps1     # OneNote COM 导出（Windows；可选）
 │           ├── convert-onenote-md.ps1 # XML → Markdown 转换（核心）
 │           └── format-onenote-xml.ps1 # XML 排版（可选；导入前使用）
-├── plugins/obscura-fetch/               # 插件：匿名网页抓取（Obscura 引擎）
+├── plugins/obscura-scrape/               # 插件：匿名网页抓取（Obscura 引擎）
 │   ├── .claude-plugin/plugin.json     # 插件元信息
 │   ├── commands/                      # 斜杠命令薄壳
 │   ├── SKILL-CN.md                    # 作者中文参考（不被 Agent 加载）
-│   └── skills/obscura-fetch/
+│   └── skills/obscura-scrape/
 │       ├── SKILL.md                   # Agent 行为 — 只做抓取与批量爬取
 │       └── scripts/
 │           └── install-obscura.ps1    # 引擎安装/升级（Windows）

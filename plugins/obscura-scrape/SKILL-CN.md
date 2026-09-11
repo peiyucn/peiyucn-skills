@@ -1,6 +1,6 @@
-# Obscura Fetch — 匿名抓取引擎（中文对照）
+# Obscura Scrape — 匿名抓取引擎（中文对照）
 
-> 本文件是 `skills/obscura-fetch/SKILL.md` 的中文同步翻译，仅供作者对照。以英文 SKILL.md 为准。
+> 本文件是 `skills/obscura-scrape/SKILL.md` 的中文同步翻译，仅供作者对照。以英文 SKILL.md 为准。
 
 通过本地 **Obscura** 引擎（Rust 无头浏览器，内嵌 V8，无 Chromium）做**匿名抓取**：一次性页面抓取、并行批量爬取、原始响应下载。
 
@@ -12,11 +12,11 @@
 | **匿名抓取 / 批量爬取 / 反指纹** | **本 skill —— `obscura fetch` / `obscura scrape`** |
 | 一切交互（点击、填表、会话、登录态、截图、验收 UI） | Playwright 栈（`playwright-cli` + 真浏览器） |
 
-> 路径约定：`{SKILL_DIR}` = 本 skill 目录（skill 运行器会解析；否则替换为 `skills/obscura-fetch` 的绝对路径）。
+> 路径约定：`{SKILL_DIR}` = 本 skill 目录（skill 运行器会解析；否则替换为 `skills/obscura-scrape` 的绝对路径）。
 
 ## 前置条件
 
-> **先装引擎——装完本插件后必须做的一步。** 插件本体只含指令与一个安装脚本；引擎二进制（约 160MB）**不随市场打包**（市场格式没有安装钩子）。运行 **`/obscura-fetch install`**，Windows 上也可直接跑 `scripts/install-obscura.ps1`。
+> **先装引擎——装完本插件后必须做的一步。** 插件本体只含指令与一个安装脚本；引擎二进制（约 160MB）**不随市场打包**（市场格式没有安装钩子）。运行 **`/obscura-scrape install`**，Windows 上也可直接跑 `scripts/install-obscura.ps1`。
 
 - 二进制落位 **`~/.obscura/bin/`**——特意放在插件目录之外的**共享用户级目录**：
   - 一份引擎服务你所有 agent（DSH / Claude Code / Codex / Copilot）；

@@ -4,4 +4,4 @@ description: Install or upgrade the Obscura engine binary — required first ste
 argument-hint: [-Force] [-Variant render|stealth|no-render|no-render-stealth]
 ---
 
-Execute the install flow from the obscura-fetch skill.
+Execute the install flow from the obscura-scrape skill.

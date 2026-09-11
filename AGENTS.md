@@ -24,12 +24,12 @@ peiyucn-skills/                          — 仓库根 = 市场
 │           ├── export-onenote.ps1     — OneNote 自动导出（Windows + COM API，可选）
 │           ├── format-onenote-xml.ps1 — XML 排版为多行缩进（抽查用，可选）
 │           └── convert-onenote-md.ps1 — XML→MD 确定性转换（核心，含 fixture 自测）
-├── plugins/obscura-fetch/           — 市场下的插件（插件名 obscura-fetch，命令命名空间 /obscura-fetch:xxx）
+├── plugins/obscura-scrape/           — 市场下的插件（插件名 obscura-scrape，命令命名空间 /obscura-scrape:xxx）
 │   ├── commands/                  — 命令薄壳（3 个 .md：fetch / install / help）
 │   ├── .claude-plugin/
 │   │   └── plugin.json            — 插件清单
 │   ├── SKILL-CN.md                — SKILL.md 中文对照（仅供作者）
-│   └── skills/obscura-fetch/
+│   └── skills/obscura-scrape/
 │       ├── SKILL.md               — **单一真相来源**：匿名抓取（fetch / 批量 scrape / stealth）+ 已知坑；脚本路径用 {SKILL_DIR} 相对约定
 │       └── scripts/
 │           └── install-obscura.ps1 — Obscura 引擎安装/升级（Windows，幂等，直连失败走代理）
@@ -42,8 +42,8 @@ peiyucn-skills/                          — 仓库根 = 市场
 | `.claude-plugin/marketplace.json` | 市场货架清单。`name` 即市场名（peiyucn-skills），插件条目声明 `source: ./plugins/note2md`；多余字段被各平台静默忽略 |
 | `docs/agent-compatibility.md` | 三平台兼容性分析与决策记录（市场/插件安装/命令注册机制） |
 | `plugins/note2md/skills/note2md/SKILL.md` | **核心**：所有 9 个命令的完整交互流程。是唯一需要维护逻辑的地方 |
-| `plugins/obscura-fetch/skills/obscura-fetch/SKILL.md` | **核心**：匿名抓取（`fetch` / 批量 `scrape` / stealth 反指纹）与已知坑；脚本路径 {SKILL_DIR} 相对约定。**刻意只做抓取**——交互式浏览一律走 Playwright 栈 |
-| `plugins/obscura-fetch/SKILL-CN.md` | SKILL.md 中文同步翻译，仅供作者对照。**修改 SKILL.md 时必须同步更新** |
+| `plugins/obscura-scrape/skills/obscura-scrape/SKILL.md` | **核心**：匿名抓取（`fetch` / 批量 `scrape` / stealth 反指纹）与已知坑；脚本路径 {SKILL_DIR} 相对约定。**刻意只做抓取**——交互式浏览一律走 Playwright 栈 |
+| `plugins/obscura-scrape/SKILL-CN.md` | SKILL.md 中文同步翻译，仅供作者对照。**修改 SKILL.md 时必须同步更新** |
 | `plugins/note2md/SKILL-CN.md` | SKILL.md 的中文同步翻译，仅供作者对照。**修改 SKILL.md 时必须同步更新** |
 | `plugins/note2md/commands/*.md` | 薄壳——仅含 frontmatter（name + description + argument-hint）+ 一句委托指令 |
 | `plugins/note2md/.claude-plugin/plugin.json` | 插件清单，声明 commands 路径；skills 目录自动发现 |
@@ -66,7 +66,7 @@ peiyucn-skills/                          — 仓库根 = 市场
 * **提交**：逐项提交，中文描述 + 英文类型前缀；可用类型 `feat` `fix` `refactor` `chore` `docs` `style` `perf` `build` `revert`（例：`feat: 新增命令自动补全`、`fix: 修复模板排序`、`docs: 补充命令交互流程文档`）；不确定的事直接说"不确定"，禁止编造事实性信息。**提交时机**：每轮对话结束时自行判断——独立完成一个功能/修复/重构且改动原子可回溯，或用户明确说「好了」「提交吧」→ 提交；还在讨论/探索、方向未定、中途打断、留了 TODO 未处理 → 先不交
 * **推送**：push 到 `dev` 后**必须**同步 `main`（`git push origin dev:main`）——Copilot Chat 市场安装拉的是 `main`，不同步会导致用户安装到旧版本；**版本号与 push 强绑定**：凡是 push，被改插件的 `plugin.json` 与 `marketplace.json` 对应条目的 `version` 必须同步更新——市场按版本号识别更新，只改代码不改版本号会导致用户装到旧版缓存；例外：未 push 的本地测试可先不改版本号，准备发布时才 bump + push
 * **发布确认（硬门禁，owner 当次点头）**：`git tag` / `npm publish` / 市场发布 / 部署上线等**不可逆的对外发布动作**，执行前必须由 owner **当次明确确认**——「之前批准了整条发布流程」「评审时说按你建议走」「继续」一律**不构成**发布许可；agent 做完审计 / 定版 / verify / 合并后**停在发布动作之前**，一句话报出「要发什么、版本号、目标通道、影响范围」等 owner 回话，未回话即视为未批准（总规范《工程管线 · ⑦发布》第 5 步）
-* **发布**：**两插件各自独立版本线**（松散集合，互不牵连：note2md 与 obscura-fetch 的版本号各自独立演进，当前值见 `marketplace.json`）；每个 push 的版本**必须**打 tag（`git tag -a {plugin}-v{version} -m "{plugin}-v{version}: {简要说明}"` + `git push origin {plugin}-v{version}`；新 tag 一律插件前缀；历史无前缀 v0.1.0–v0.5.1 是 note2md 单插件时期的遗留，保留不动）；版本规则：`fix` → patch（0.5.3 → 0.5.4）、`feat` → minor（0.5.3 → 0.6.0）、破坏性变更 → major；流程：bump 被改插件的 `plugin.json` + `marketplace.json` 对应条目 → commit → push dev → push dev:main → 打 tag → push tag，**一个版本一个 commit，版本号与代码同批推送**
+* **发布**：**两插件各自独立版本线**（松散集合，互不牵连：note2md 与 obscura-scrape 的版本号各自独立演进，当前值见 `marketplace.json`）；每个 push 的版本**必须**打 tag（`git tag -a {plugin}-v{version} -m "{plugin}-v{version}: {简要说明}"` + `git push origin {plugin}-v{version}`；新 tag 一律插件前缀；历史无前缀 v0.1.0–v0.5.1 是 note2md 单插件时期的遗留，保留不动）；版本规则：`fix` → patch（0.5.3 → 0.5.4）、`feat` → minor（0.5.3 → 0.6.0）、破坏性变更 → major；流程：bump 被改插件的 `plugin.json` + `marketplace.json` 对应条目 → commit → push dev → push dev:main → 打 tag → push tag，**一个版本一个 commit，版本号与代码同批推送**
 * **commit 前检查工程文件**：任何涉及行为/结构的改动，commit 前必须检查以下文件是否需要同步调整：
   * `AGENTS.md` — 项目结构树、关键文件表、命令数量（**结构改动必查**；曾因漏掉本文件，结构树长期写着已删除的目录）
   * `README.md` / `README.zh-CN.md` — 功能描述、命令列表、导入说明

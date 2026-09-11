@@ -1,10 +1,10 @@
 ---
-name: obscura-fetch
+name: obscura-scrape
 description: "Use this skill for anonymous web scraping and batch crawling with the local Obscura engine (Rust headless browser, no Chromium). Covers: one-shot page fetch as Markdown / text / HTML / links, parallel batch scraping, stealth anti-fingerprinting, proxy use, and raw binary-safe response download. Use it when a page is JS-heavy, when a site blocks ordinary fetches, or when you need many URLs at once. This skill is scrape-only: for anything interactive — clicking, form filling, multi-step sessions, login state, screenshots, or verifying your own UI — use the Playwright stack instead. Trigger phrases: 抓取, 爬取, 批量抓取, 网页抓取, JS 渲染, 匿名, 反指纹, obscura, scraping, crawl, batch scrape, headless browser, markdown dump."
 metadata: {"source": "https://github.com/h4ckf0r0day/obscura", "requires": {"files": ["~/.obscura/bin/obscura.exe"]}}
 ---
 
-# Obscura Fetch — Anonymous Scraping Engine
+# Obscura Scrape — Anonymous Scraping Engine
 
 Use the local **Obscura** engine (Rust headless browser, embedded V8, no Chromium) for **anonymous scraping**: one-shot page fetch, parallel batch crawling, raw response download.
 
@@ -16,11 +16,11 @@ Use the local **Obscura** engine (Rust headless browser, embedded V8, no Chromiu
 | **Anonymous scrape / batch crawl / anti-fingerprint** | **this skill — `obscura fetch` / `obscura scrape`** |
 | Anything interactive (click, fill, session, login state, screenshot, verify UI) | Playwright stack (`playwright-cli` + a real browser) |
 
-> Path convention: `{SKILL_DIR}` = this skill's directory (the skill runner resolves it; otherwise substitute the absolute path of `skills/obscura-fetch`).
+> Path convention: `{SKILL_DIR}` = this skill's directory (the skill runner resolves it; otherwise substitute the absolute path of `skills/obscura-scrape`).
 
 ## Prerequisites
 
-> **Install the engine once.** This plugin ships instructions and one installer script; the engine binary (~160 MB) is **not** bundled (marketplace formats have no install hooks). Run **`/obscura-fetch install`**, or `scripts/install-obscura.ps1` directly on Windows.
+> **Install the engine once.** This plugin ships instructions and one installer script; the engine binary (~160 MB) is **not** bundled (marketplace formats have no install hooks). Run **`/obscura-scrape install`**, or `scripts/install-obscura.ps1` directly on Windows.
 
 - The binary lands in **`~/.obscura/bin/`** — a shared, per-user location *outside* the plugin directory, on purpose:
   - one engine copy serves every agent you use (DSH, Claude Code, Codex, Copilot);

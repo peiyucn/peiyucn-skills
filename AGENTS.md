@@ -77,9 +77,10 @@ peiyucn-skills/                          — 仓库根 = 市场
 
 ## 安全基线（本仓库自含要点）
 
-* 已开启：secret scanning + push protection、根 `SECURITY.md`；检查命令 `gh api repos/peiyucn/peiyucn-skills --jq .security_and_analysis`
-* 未开启（与统一安全基线有出入，2026-09 查证）：Dependabot alerts、CodeQL default setup、Dependabot 自动升级
-* 分支保护：`dev` 与默认分支两个 ruleset 轻保护（禁删/禁强推/禁建）；无 CI
+* 已开启（2026-09 逐项核验）：Dependabot alerts（仅报警）、secret scanning + push protection、根 `SECURITY.md`
+* 未开启（与统一安全基线有出入，2026-09 逐项核验）：CodeQL default setup（`state=not-configured`）、Dependabot 自动升级
+* 分支保护三层（2026-09 逐项核验）：① 经典保护 **未设**（与基线的出入：无「要求对话解决 / 不允许绕过」）② ruleset 轻保护 ✓（`dev` 与默认分支各一条：禁删/禁强推/禁建）③ 仓库合并设置 **非 Squash-only**（与基线的出入：`allow_merge_commit` / `allow_rebase_merge` / `allow_squash_merge` 三个全开）；无 CI
+* **核验别只跑 `.security_and_analysis`**（它只含 secret scanning 项）——逐项命令见根规范《统一安全基线 · 逐项检查命令》；2026-09 就是只看那一条，把实际开着的 Dependabot alerts 误记成「未开启」
 
 ## GitHub 与网络
 

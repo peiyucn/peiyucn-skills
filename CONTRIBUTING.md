@@ -15,25 +15,17 @@ Workflow: `dev` → feature branch → PR → `dev` → (when ready) → `main`.
 ```
 peiyucn-skills/                              # Repo root = marketplace
 ├── .claude-plugin/marketplace.json    # Marketplace registry (name: peiyucn-skills)
-├── plugins/note2md/                   # Plugin: Markdown note management
-│   ├── .claude-plugin/plugin.json     # Plugin metadata
-│   ├── commands/                      # Slash-command stubs (thin shells)
-│   ├── SKILL-CN.md                    # Chinese reference for the author (not loaded by agents)
-│   └── skills/note2md/
-│       ├── SKILL.md                   # Agent behavior — all command logic lives here
-│       ├── templates/                 # Built-in page templates
-│       └── tools/
-│           ├── export-onenote.ps1     # OneNote COM export (Windows; optional)
-│           ├── convert-onenote-md.ps1 # XML → Markdown conversion (core)
-│           └── format-onenote-xml.ps1 # XML pretty-printing (optional; before import)
-├── plugins/obscura-scrape/               # Plugin: anonymous web scraping (Obscura engine)
-│   ├── .claude-plugin/plugin.json     # Plugin metadata
-│   ├── commands/                      # Slash-command stubs (thin shells)
-│   ├── SKILL-CN.md                    # Chinese reference for the author (not loaded by agents)
-│   └── skills/obscura-scrape/
-│       ├── SKILL.md                   # Agent behavior — fetch / batch scrape only
-│       └── scripts/
-│           └── install-obscura.ps1    # Engine install/upgrade (Windows)
+└── plugins/note2md/                   # Plugin: Markdown note management
+    ├── .claude-plugin/plugin.json     # Plugin metadata
+    ├── commands/                      # Slash-command stubs (thin shells)
+    ├── SKILL-CN.md                    # Chinese reference for the author (not loaded by agents)
+    └── skills/note2md/
+        ├── SKILL.md                   # Agent behavior — all command logic lives here
+        ├── templates/                 # Built-in page templates
+        └── tools/
+            ├── export-onenote.ps1     # OneNote COM export (Windows; optional)
+            ├── convert-onenote-md.ps1 # XML → Markdown conversion (core)
+            └── format-onenote-xml.ps1 # XML pretty-printing (optional; before import)
 
 > `notes/` and `.note2md/` are user-space — they do not live in this repo.
 > `test/` is a scratch directory for manual testing — gitignored.

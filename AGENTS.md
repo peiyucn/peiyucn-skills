@@ -50,7 +50,7 @@ peiyucn-skills/
 
 * 已开启（2026-09 逐项核验）：Dependabot alerts（仅报警）、secret scanning + push protection、根 `SECURITY.md`
 * 未开启（与基线有出入，2026-09 逐项核验）：CodeQL default setup（`state=not-configured`）、Dependabot 自动升级
-* 分支保护三层（2026-09 逐项核验）：经典保护 **未设**（出入：无「要求对话解决 / 不允许绕过」）；ruleset 轻保护 ✓（`dev` 与默认分支各一条）；合并设置 **非 Squash-only**（出入：三个合并方式全开）；核验按根规范《统一安全基线 · 逐项检查命令》逐项跑
+* 分支保护三层（2026-10-23 逐项核验）：经典保护 ✅（main：禁删除 + 禁强推 + enforce_admins，**不设** required status checks）；ruleset 轻保护 ✅（`main` 与 `dev` 各一条，规则为禁删除 / 禁强推 / 禁重建）；合并设置 **Squash-only** ✅；核验按根规范《统一安全基线 · 逐项检查命令》逐项跑
 
 ## GitHub 与网络
 

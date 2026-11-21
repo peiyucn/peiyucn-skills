@@ -1,28 +1,16 @@
 # peiyucn-skills — Agent 技能市场
 
-简体中文 | [English](README.md) | [GitHub](https://github.com/peiyucn/peiyucn-skills)
+简体中文 | [English](README.md) | [GitHub](https://github.com/peiyucn/peiyucn-skills) | [更新日志](CHANGELOG.zh-CN.md)
 
-> Agent 原生技能，可在 Copilot、Claude Code、Codex 上通用安装。本仓库是一个个个市场个个 — 添加一次，即可安装它提供的任意插件。
+> Agent 原生技能，可在 Copilot、Claude Code、Codex 上通用安装。本仓库是一个市场 — 添加一次，即可安装它提供的任意插件。
 
 ## 安装市场
 
+**VS Code Copilot** — 添加市场 `https://github.com/peiyucn/peiyucn-skills`，然后安装你需要的插件。
 
+**Claude Code** — 先 `/marketplace add https://github.com/peiyucn/peiyucn-skills`，再 `/plugin install note2md`。
 
-VS Code Copilot
-
- — 添加市场 `https://github.com/peiyucn/peiyucn-skills`，然后安装你需要的插件。
-
-
-
-Claude Code
-
- — 先 `/marketplace add https://github.com/peiyucn/peiyucn-skills`，再 `/plugin install note2md`。
-
-
-
-Codex CLI
-
- — `codex plugin install https://github.com/peiyucn/peiyucn-skills`（安装市场内的全部插件）。
+**Codex CLI** — `codex plugin install https://github.com/peiyucn/peiyucn-skills`（安装市场内的全部插件）。
 
 ## 插件
 
@@ -30,7 +18,7 @@ Codex CLI
 
 Markdown 笔记，按笔记本→分区→页面三层结构组织，通过斜杠命令管理。你的笔记就是文件夹和 `.md` 文件 — 用任何编辑器都能打开。但 Agent 也能帮你管理：创建笔记本、组织分区、从模板写页面、从 OneNote 导入、归档旧内容。
 
->   模型要求：   本技能依赖模型执行多步流程（导入管线、模板工作流、校验环节）。已在   deepseek-v4-flash（high）   上测试验证 — 能力不低于此模型的应可正常使用。过小或较弱的模型可能执行不稳定，我们无法给出硬性保证。
+> **模型要求：** 本技能依赖模型执行多步流程（导入管线、模板工作流、校验环节）。已在 **deepseek-v4-flash（high）** 上测试验证 — 能力不低于此模型的应可正常使用。过小或较弱的模型可能执行不稳定，我们无法给出硬性保证。
 
 #### 命令
 
@@ -72,10 +60,10 @@ Markdown 笔记，按笔记本→分区→页面三层结构组织，通过斜�
 
 使用 `/note2md init` 导入你现有的 OneNote 笔记本。文本类内容 — 表格、列表、标题、待办、OCR 文本 — 会自动转换为 Markdown。
 
-*   Windows + OneNote 桌面版：   Agent 可以自动导出你的笔记本。
-*   macOS / Linux（或无 OneNote 桌面版）：   没有自动导出（仅限 Windows）— 你需要自己导出 XML（例如在装有 OneNote 桌面版的 Windows 机器上导出），再把文件位置告诉 `init`。
+* **Windows + OneNote 桌面版：** Agent 可以自动导出你的笔记本。
+* **macOS / Linux（或无 OneNote 桌面版）：** 没有自动导出（仅限 Windows）— 你需要自己导出 XML（例如在装有 OneNote 桌面版的 Windows 机器上导出），再把文件位置告诉 `init`。
 
->   已知限制：   图片、文件附件、超链接、墨迹/绘图、公式、音频、视频频频暂不提取频频（完整清单见 [docs/onenote-loss-matrix.md](docs/onenote-loss-matrix.md)）。仅保证文本类内容。
+> **已知限制：** 图片、文件附件、超链接、墨迹/绘图、公式、音频、视频暂不提取（完整清单见 [docs/onenote-loss-matrix.md](docs/onenote-loss-matrix.md)）。仅保证文本类内容。
 
 #### AGENTS.md
 

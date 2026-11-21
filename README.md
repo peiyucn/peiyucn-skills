@@ -1,6 +1,6 @@
 # peiyucn-skills — Agent Skills Marketplace
 
-[简体中文](README.zh-CN.md) | English | [GitHub](https://github.com/peiyucn/peiyucn-skills)
+[简体中文](README.zh-CN.md) | English | [GitHub](https://github.com/peiyucn/peiyucn-skills) | [Changelog](CHANGELOG.md)
 
 > Agent-native skills, installable across Copilot, Claude Code, and Codex. This repo is a **marketplace** — add it once, then install any plugin it ships.
 

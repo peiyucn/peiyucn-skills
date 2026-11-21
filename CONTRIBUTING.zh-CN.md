@@ -4,21 +4,22 @@
 
 ## 分支策略
 
-- `main` — 稳定，可发布。禁止直接提交。
+- `main` — 稳定，可发布。只接受来自 `dev` 的发布 PR，用 merge commit 合并。
 - `dev` — 活跃开发。所有工作从 `dev` 拉分支，合并回 `dev`。
 - 功能分支 — `feature/<名称>` 从 `dev` 拉出，通过 PR 合并。
 
-工作流：`dev` → 功能分支 → PR → `dev` →（就绪后）→ `main`。
+工作流：`dev` → 功能分支 → PR → `dev` → 发布 PR（merge commit）→ `main` → annotated tag。
 
-## 核心原则
-
-**笔记本 → 分区 → 页面 三层结构不可动摇。** 每条笔记位于 `{Notebook}/{Section}/{page}.md`。不得增加其他目录层级或扁平化结构。Agent 的导航、搜索和归档逻辑全部依赖此三层结构。添加任何功能前，先确认是否遵守此约束。
+控制文件（`AGENTS.md`、`meta/`、`.github/`、SKILL 文档）由 CODEOWNERS 覆盖，须 owner 审阅；agent 不自合并。
 
 ## 项目结构
 
 ```
 peiyucn-skills/                              # 仓库根 = 市场
 ├── .claude-plugin/marketplace.json    # 市场货架清单（name: peiyucn-skills）
+├── .github/CODEOWNERS                 # 控制文件由 owner 审阅
+├── CHANGELOG.md / CHANGELOG.zh-CN.md  # note2md 发布历史
+├── meta/                              # 共享工程规则快照
 └── plugins/note2md/                   # 插件：Markdown 笔记管理
     ├── .claude-plugin/plugin.json     # 插件元信息
     ├── commands/                      # 斜杠命令薄壳
@@ -30,12 +31,14 @@ peiyucn-skills/                              # 仓库根 = 市场
             ├── export-onenote.ps1     # OneNote COM 导出（Windows；可选）
             ├── convert-onenote-md.ps1 # XML → Markdown 转换（核心）
             └── format-onenote-xml.ps1 # XML 排版（可选；导入前使用）
+```
 
 > `notes/` 和 `.note2md/` 属于用户空间 — 不在此仓库中。
 > `test/` 是手工测试用的临时目录 — 已被 git 忽略。
-```
 
-## 工作原理
+## 核心原则
+
+**笔记本 → 分区 → 页面 三层结构不可动摇。** 每条笔记位于 `{Notebook}/{Section}/{page}.md`。不得增加其他目录层级或扁平化结构。Agent 的导航、搜索和归档逻辑全部依赖此三层结构。添加任何功能前，先确认是否遵守此约束。
 
 `SKILL.md` 是唯一真相来源。它定义了每个命令、每个交互流程、每个约定。Agent（Copilot、Claude Code、Codex）加载并遵循它。
 

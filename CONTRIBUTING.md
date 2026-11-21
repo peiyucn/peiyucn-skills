@@ -4,17 +4,22 @@
 
 ## Branch Strategy
 
-- `main` — stable, release-ready. Never commit directly.
+- `main` — stable, release-ready. Only release PRs from `dev` land here; merge with a merge commit.
 - `dev` — active development. All work branches from and merges into `dev`.
 - Feature branches — `feature/<name>` off `dev`, merged back via PR.
 
-Workflow: `dev` → feature branch → PR → `dev` → (when ready) → `main`.
+Workflow: `dev` → feature branch → PR → `dev` → release PR (merge commit) → `main` → annotated tag.
+
+Control files (`AGENTS.md`, `meta/`, `.github/`, SKILL docs) are covered by CODEOWNERS and need owner review; agents do not self-merge.
 
 ## Project Structure
 
 ```
 peiyucn-skills/                              # Repo root = marketplace
 ├── .claude-plugin/marketplace.json    # Marketplace registry (name: peiyucn-skills)
+├── .github/CODEOWNERS                 # Owner review for control files
+├── CHANGELOG.md / CHANGELOG.zh-CN.md  # note2md release history
+├── meta/                              # Shared engineering rules snapshot
 └── plugins/note2md/                   # Plugin: Markdown note management
     ├── .claude-plugin/plugin.json     # Plugin metadata
     ├── commands/                      # Slash-command stubs (thin shells)
@@ -26,10 +31,10 @@ peiyucn-skills/                              # Repo root = marketplace
             ├── export-onenote.ps1     # OneNote COM export (Windows; optional)
             ├── convert-onenote-md.ps1 # XML → Markdown conversion (core)
             └── format-onenote-xml.ps1 # XML pretty-printing (optional; before import)
+```
 
 > `notes/` and `.note2md/` are user-space — they do not live in this repo.
 > `test/` is a scratch directory for manual testing — gitignored.
-```
 
 ## Guiding Principle
 

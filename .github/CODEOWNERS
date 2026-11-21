@@ -1,0 +1,12 @@
+/AGENTS.md @peiyucn
+/meta/ @peiyucn
+/.github/ @peiyucn
+/.claude-plugin/ @peiyucn
+/plugins/*/.claude-plugin/ @peiyucn
+/plugins/*/SKILL.md @peiyucn
+/plugins/*/SKILL-CN.md @peiyucn
+/CONTRIBUTING.md @peiyucn
+/CONTRIBUTING.zh-CN.md @peiyucn
+/SECURITY.md @peiyucn
+/CHANGELOG.md @peiyucn
+/CHANGELOG.zh-CN.md @peiyucn

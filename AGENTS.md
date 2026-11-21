@@ -127,7 +127,7 @@ Agent 技能市场（marketplace），仓库根即市场货架；仓库公开：
 - Dependabot 自动升级 / security updates 保持关闭；secret scanning 非提供商模式、validity checks 保持关闭。
 - CodeQL default setup 已配置；仓库只有 PowerShell / Markdown，GitHub CodeQL 无受支持语言（`code-scanning/default-setup` 的 `languages` 为空），因此没有可扫描语言。
 - 分支保护三层：经典保护（`main`：禁删除 / 禁强推 / 不允许绕过 / 要求对话解决）；ruleset 轻保护（`main` 与 `dev` 各一条，禁删除 / 禁强推 / 禁重建，无 bypass）；合并设置（squash + merge commit，关闭 rebase）。
-- 发布 tag 保护：`refs/tags/*-v*`，禁创建 / 更新 / 删除，owner bypass = always。
+- 发布 tag 保护：`refs/tags/*v*`（覆盖 `note2md-v*` 与历史 `v*`），禁创建 / 更新 / 删除，owner bypass = always。
 - CODEOWNERS 覆盖 AGENTS / meta / `.github` / 插件清单与 SKILL 文档；机器可读期望值见 meta-repo `github-policy.json`，核验命令 `node meta/scripts/check-github-policy.mjs`。
 
 #### GitHub 与网络

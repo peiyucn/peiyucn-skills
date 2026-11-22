@@ -4,11 +4,11 @@
 
 ## 分支策略
 
-- `main` — 稳定，可发布。只接受来自 `dev` 的发布 PR，用 merge commit 合并。
-- `dev` — 活跃开发。所有工作从 `dev` 拉分支，合并回 `dev`。
-- 功能分支 — `feature/<名称>` 从 `dev` 拉出，通过 PR 合并。
+- `main` — 稳定，可发布。所有工作通过 PR 合入。
+- 功能分支 — `feature/<名称>` 从 `main` 拉出，通过 PR 合并（squash）。
+- 不设 `dev` 分支。
 
-工作流：`dev` → 功能分支 → PR → `dev` → 发布 PR（merge commit）→ `main` → annotated tag。
+工作流：`main` → 功能分支 → PR → `main`（squash）→ annotated tag。
 
 控制文件（`AGENTS.md`、`meta/`、`.github/`、SKILL 文档）由 CODEOWNERS 覆盖，须 owner 审阅；agent 不自合并。
 

@@ -4,11 +4,11 @@
 
 ## Branch Strategy
 
-- `main` — stable, release-ready. Only release PRs from `dev` land here; merge with a merge commit.
-- `dev` — active development. All work branches from and merges into `dev`.
-- Feature branches — `feature/<name>` off `dev`, merged back via PR.
+- `main` — stable, release-ready. All work lands here via PR.
+- Feature branches — `feature/<name>` off `main`, merged back via PR (squash).
+- No `dev` branch.
 
-Workflow: `dev` → feature branch → PR → `dev` → release PR (merge commit) → `main` → annotated tag.
+Workflow: `main` → feature branch → PR → `main` (squash) → annotated tag.
 
 Control files (`AGENTS.md`, `meta/`, `.github/`, SKILL docs) are covered by CODEOWNERS and need owner review; agents do not self-merge.
 

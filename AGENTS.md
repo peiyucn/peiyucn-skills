@@ -91,8 +91,8 @@ Agent 技能市场（marketplace），仓库根即市场货架；仓库公开：
 ### 工程管线
 
 - 无 `package.json`：E8 的 `npm run lint:code / lint:policy / lint / verify` 不适用；用下方「提交前文档自查」替代，作为本仓库的验证入口。
-- 开发分支 `dev`；默认分支 `main` 供市场安装拉取。发布时从 `dev` 开 `dev → main` 的发布 PR，用 **merge commit** 合并，不用 squash；合并后从 `main` 打 tag。
-- 发布顺序：bump 版本 → 提交 → push `dev` → 发布 PR（merge commit）→ owner 当次确认 → 合并 → annotated tag → push tag。
+- 单分支 `main`：功能分支 → PR → `main`（squash）；不设集成分支，发布即打 tag。
+- 发布顺序：功能分支 → PR（squash）→ owner 当次确认 → 合并 → annotated tag → push tag。
 - 发布确认是硬门禁：`git tag` / 市场发布等不可逆动作前，owner 必须当次明确同意；此前批准、笼统「继续」不构成许可。agent 停在发布动作前，报出「发什么、版本号、目标通道、影响范围」，未回话视为未批准。
 - tag：`{plugin}-v{version}` annotated；单次推送不超过 3 个；已发布 tag 不覆盖、不移动。
 - 提交：一个 commit 只做一件事；中文描述 + 英文类型前缀（feat / fix / refactor / chore / docs / style / perf / build / revert）；还在讨论 / 方向未定 / 留 TODO 的先不交。
@@ -126,7 +126,7 @@ Agent 技能市场（marketplace），仓库根即市场货架；仓库公开：
 - 公开仓库；Dependabot alerts 已开启（仅报警）；secret scanning 与 push protection 已开启；private vulnerability reporting 已开启；根目录 `SECURITY.md` 存在。
 - Dependabot 自动升级 / security updates 保持关闭；secret scanning 非提供商模式、validity checks 保持关闭。
 - CodeQL default setup 已配置；仓库只有 PowerShell / Markdown，GitHub CodeQL 无受支持语言（`code-scanning/default-setup` 的 `languages` 为空），因此没有可扫描语言。
-- 分支保护三层：经典保护（`main`：禁删除 / 禁强推 / 不允许绕过 / 要求对话解决）；ruleset 轻保护（`main` 与 `dev` 各一条，禁删除 / 禁强推 / 禁重建，无 bypass）；合并设置（squash + merge commit，关闭 rebase）。
+- 分支保护三层：经典保护（`main`：禁删除 / 禁强推 / 不允许绕过 / 要求对话解决）；ruleset 轻保护（`main` 一条，禁删除 / 禁强推 / 禁重建，无 bypass）；合并设置（仅 squash，关闭 merge commit 与 rebase）；合并后自动删除分支。
 - 发布 tag 保护：`refs/tags/*v*`（覆盖 `note2md-v*` 与历史 `v*`），禁创建 / 更新 / 删除，owner bypass = always。
 - CODEOWNERS 覆盖 AGENTS / meta / `.github` / 插件清单与 SKILL 文档；机器可读期望值见 meta-repo `github-policy.json`，核验命令 `node meta/scripts/check-github-policy.mjs`。
 
@@ -146,7 +146,7 @@ Agent 技能市场（marketplace），仓库根即市场货架；仓库公开：
 
 ## 4. 改写
 
-无
+override: E7 → 单分支 main；仓库无 CI，发布即打 tag
 
 ## 5. 本地 meta
 
